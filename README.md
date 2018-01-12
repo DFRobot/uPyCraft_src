@@ -16,5 +16,7 @@ Open uPyCraft.py with python3.4 IDE, click the run module button/F5 to run.
 ### install py2exe
 Running
 ```
-py2exe uPyCraft.py
+python pack.py py2exe
 ```
+
+uPyCraft.exe will created in directory dist/ .
