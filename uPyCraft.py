@@ -40,7 +40,7 @@ from microbit_api               import MICROPYTHON_APIS
 from MONACO import monaco
 
 mainShow=True
-nowIDEVersion      ="0.29"
+nowIDEVersion      ="0.30"
 isCheckFirmware    =False
 rootDirectoryPath  =os.path.expanduser("~")
 rootDirectoryPath  =rootDirectoryPath.replace("\\","/")

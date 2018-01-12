@@ -13,7 +13,7 @@ import zipfile
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-nowIDEVersion      ="0.29"
+nowIDEVersion      ="0.30"
 nowExamplesVersion="v0.0"
 rootDirectoryPath  =os.path.expanduser("~")
 rootDirectoryPath  =rootDirectoryPath.replace("\\","/")

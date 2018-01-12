@@ -18,7 +18,7 @@ py2exe_options = {
 setup(
       name = 'IDE',
       version = '1.0',
-      windows = [{"script":'main.py',
+      windows = [{"script":'uPyCraft.py',
                   "icon_resources": [(1,"./images/logo.ico")]
                 }], 
       zipfile = None,
