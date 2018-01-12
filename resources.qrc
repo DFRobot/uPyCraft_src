@@ -1,0 +1,37 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+<qresource>
+    <file alias="about.png">images/about.png</file>
+    <file alias="board.png">images/board.png</file>
+    <file alias="clear.png">images/clear.png</file>
+    <file alias="close.png">images/close.png</file>
+    <file alias="connect.png">images/connect.png</file>
+    <file alias="copy.png">images/copy.png</file>
+    <file alias="cut.png">images/cut.png</file>
+    <file alias="download.png">images/download.png</file>
+    <file alias="downloadandrun.png">images/downloadandrun.png</file>
+    <file alias="edit.png">images/edit.png</file>
+    <file alias="examples.png">images/examples.png</file>
+    <file alias="exit.png">images/exit.png</file>
+    <file alias="fileopen.png">images/fileopen.png</file>
+    <file alias="find.png">images/find.png</file>
+    <file alias="flush.png">images/flush.png</file>
+    <file alias="ic.png">images/ic.png</file>
+    <file alias="insted.png">images/insted.png</file>
+    <file alias="logo.ico">images/logo.ico</file>
+    <file alias="logo.png">images/logo.png</file>
+    <file alias="newfile.png">images/newfile.png</file>
+    <file alias="paste.png">images/paste.png</file>
+    <file alias="pc.png">images/pc.png</file>
+    <file alias="redo.png">images/redo.png</file>
+    <file alias="save.png">images/save.png</file>
+    <file alias="saveas.png">images/saveas.png</file>
+    <file alias="serial.png">images/serial.png</file>
+    <file alias="stop.png">images/stop.png</file>
+    <file alias="undo.png">images/undo.png</file>
+    <file alias="Upy25.png">images/Upy25.png</file>
+    <file alias="syntaxCheck.png">images/syntaxCheck.png</file>
+    <file alias="init.png">images/init.png</file>
+    <file alias="burnFirmware.png">images/burnFirmware.png</file>
+</qresource>
+</RCC>
