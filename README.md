@@ -4,5 +4,17 @@
 ## Installation
 This requires you to have python3.4, pyqt4, py2exe, qsci, pyserial and pyflakes installed.
 
+### install python3.4
+
+### install pyqt4, qsci, qsci, pyserial and pyflakes.
+
 ## Running
 Open uPyCraft.py with python3.4 IDE, click the run module button/F5 to run.
+
+## pakege uPyCraft
+
+### install py2exe
+run 
+```
+py2exe uPyCraft.py
+```
