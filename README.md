@@ -14,7 +14,7 @@ Open uPyCraft.py with python3.4 IDE, click the run module button/F5 to run.
 ## pakege uPyCraft
 
 ### install py2exe
-run 
+Running
 ```
 py2exe uPyCraft.py
 ```
