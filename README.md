@@ -6,7 +6,7 @@ This requires you to have python3.4, pyqt4, py2exe, qsci, pyserial and pyflakes 
 
 1. python3.4:
 
-    download address:https://www.python.org/downloads/windows/ .
+    download address:https://www.python.org/downloads/windows/ .<br>
         add python to the windows environment variable when installed. 
 
     update pip： python -m pip install -U pip .
