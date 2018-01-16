@@ -32,7 +32,7 @@ This requires you to have python3.4, pyqt4, py2exe, qsci, pyserial and pyflakes 
             nmake
             nmake install
         
-    PyQt4:
+    PyQt4:<br>
         download address:https://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-4.11.4/ <br>
         follow "next" to install. <br>
 
