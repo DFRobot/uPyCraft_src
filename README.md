@@ -9,26 +9,28 @@ This requires you to have python3.4, pyqt4, py2exe, qsci, pyserial and pyflakes 
     download address:https://www.python.org/downloads/windows/ <br>
         add python to the windows environment variable when installed.<br> 
 
-    update pip： python -m pip install -U pip <br>
-        add pip to the windows environment variable, such as C:/Python34/Scripts <br>
+    update pip： python -m pip install -U pip 
+        add pip to the windows environment variable, such as C:/Python34/Scripts 
         
-    pyserial:pip install pyserial <br>
+    pyserial:pip install pyserial 
     
-    py2exe  :pip install py2exe <br>
+    py2exe  :pip install py2exe 
     
-    pyflakes:pip install pyflakes <br>
-        find api.py and replace with pyflakesChange/api.py <br>
+    pyflakes:pip install pyflakes 
+        find api.py and replace with pyflakesChange/api.py 
     
 2. pyqt4:<br>
 
     sip：<br>
         download address:https://www.riverbankcomputing.com/software/sip/download <br>
-        unpack the directory and open <br>
-        exec:<br>
-            python configure.py <br>
-        enter Visual Studio command prompt, changedir to sip installed path<br>
-            nmake<br>
-            nmake install<br>
+        
+        unpack the directory and open
+        exec:
+            python configure.py
+        
+        enter Visual Studio command prompt, changedir to sip installed path
+            nmake
+            nmake install
         
     PyQt4:
         download address:https://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-4.11.4/ <br>
