@@ -4,7 +4,8 @@
 ## Installation
 This requires you to have python3.4, pyqt4, py2exe, qsci, pyserial and pyflakes installed.
 
-1. python3.4
+1. python3.4:
+
     download address:https://www.python.org/downloads/windows/
         add python to the windows environment variable when installed. 
 
@@ -18,8 +19,8 @@ This requires you to have python3.4, pyqt4, py2exe, qsci, pyserial and pyflakes 
     pyflakes:pip install pyflakes
         find api.py and replace with pyflakesChange/api.py
     
-2. pyqt4
-    install sip and PyQt4
+2. pyqt4:
+
     sip：
         download address:https://www.riverbankcomputing.com/software/sip/download
         
