@@ -2,7 +2,7 @@
 #### uPyCraft is an IDE designed for micropython that supports Windows 7, Windows 8, Windows 10, MAC OSX 10.11, and above.To make it easier for users to use, uPyCraft is released in green in all systems, no need to install.
 
 ## Installation
-This requires you to have python3.4, pyqt4, py2exe, qsci, pyserial and pyflakes installed.
+This requires you to have python3.4, pyqt4, py2exe, SIP, pyserial and pyflakes installed.
 
 1. python3.4:<br>
 
