@@ -7,7 +7,7 @@ This requires you to have python3.4, pyqt4, py2exe, SIP, pyserial and pyflakes i
 1. python3.4:<br>
 
     download address:https://www.python.org/downloads/windows/ <br>
-        add python to the windows environment variable when installed.<br> 
+        add python to the windows environment variable when installed, such as C:/Python34<br>
 
     update pip： python -m pip install -U pip 
         add pip to the windows environment variable, such as C:/Python34/Scripts 
