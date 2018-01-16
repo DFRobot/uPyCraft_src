@@ -1569,7 +1569,7 @@ class MainWidget(QMainWindow):
             configFile.close()
 
     def slotAbout(self):
-        webbrowser.open("https://dfrobot.gitbooks.io/upycraft_cn/",0,True)
+        webbrowser.open("http://docs.dfrobot.com.cn/upycraft",0,True)
 
     def slotTerminalCursorChanged(self):
         if self.terminal.terminalSelect:
