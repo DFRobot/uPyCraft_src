@@ -1688,6 +1688,8 @@ def write_flash(esp, args):
 
     for address, argfile in args.addr_filename:
         print("=============for  addr ======================")
+        #print(address)
+        #print(argfile)
         if args.no_stub:
             print('Erasing flash...')
         image = pad_to(argfile.read(), 4)
@@ -1954,6 +1956,22 @@ def downOkReset():
     updateOkReset._port.setRTS(False)
     updateOkReset._port.setRTS(True)
     updateOkReset._port.close()
+    
+def espCloseReset(port,board):
+    args=Args()
+    args.chip=board
+    initial_baud = min(ESPLoader.ESP_ROM_BAUD, args.baud)
+    chip_class = {
+        'esp8266': ESP8266ROM,
+        'esp32': ESP32ROM,
+    }[args.chip]
+    esp = chip_class(port, initial_baud)
+    esp.connect(args.before)
+    esp._port.rtscts=True
+    esp._port.setRTS(False)
+    esp._port.setRTS(True)
+    esp._port.close()
+    
 
 def Burn(obj,board,filename,port,erase=False,writeFlashAddr=0):
     args=Args()

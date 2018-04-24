@@ -104,6 +104,7 @@ class myTerminal(QTextEdit):
             return QMainWindow.eventFilter(self,watch,event)
 
     def changeBoard(self,board):
+        #print("changeBoard")
         self.currentBoard=board
 
     def initRecvdata(self):
@@ -464,12 +465,20 @@ class myTreeView(QTreeView):
         self.filename=""
         self.dragFrom=""
         self.dropDir=""
-        self.connect(self,SIGNAL("clicked(QModelIndex)"),self.chooseFile)
+        #self.connect(self,SIGNAL("clicked(QModelIndex)"),self.chooseFile)
         self.connect(self,SIGNAL("pressed(QModelIndex)"),self.treepressed)
 
     def setmodel(self,model):
         self.setModel(model)
 
+    #def mousePressEvent(self,event):
+    #    if event.button()==Qt.LeftButton:
+    #        print("left")
+	#    elif event.button()==Qt.RightButton:
+    #        print("right")
+    #    else:
+    #        print("else")
+	#   return QMainWindow.eventFilter(self,event)
     def createRightMenu(self):
         self.setContextMenuPolicy(Qt.CustomContextMenu)
 
@@ -516,14 +525,17 @@ class myTreeView(QTreeView):
         elif (self.ui.fileName=="." or self.ui.fileName=="/flash") and not self.ui.myserial.ser.isOpen():
             pass
         elif self.ui.fileName=="/sd" or \
-             (self.ui.fileName.find(":")>=0 and self.ui.fileName.split("/")[-1]=="uPy_lib"):
+             (self.ui.fileName.find(rootDirectoryPath)>=0 and self.ui.fileName.split("/")[-1]=="uPy_lib"):
             pass
-        elif self.ui.fileName.find(":")>=0 and self.ui.fileName.find("uPy_lib")>0:
+        #elif self.ui.fileName.find(":")>=0 and self.ui.fileName.find("uPy_lib")>0:
+        elif self.ui.fileName.find(rootDirectoryPath)>=0 and self.ui.fileName.find("uPy_lib")>0:
             self.rightClickMenu.addAction(self.openFile)
             self.rightClickMenu.addAction(self.closeFile)
-        elif self.ui.fileName.find(":")>=0 and self.ui.fileName.split("/")[-1]=="workSpace":
+        #elif self.ui.fileName.find(":")>=0 and self.ui.fileName.split("/")[-1]=="workSpace":
+        elif self.ui.fileName.find(rootDirectoryPath)>=0 and self.ui.fileName.split("/")[-1]=="workSpace":
             self.rightClickMenu.addAction(self.openFile)
-        elif self.ui.fileName.find(":")>=0 and self.ui.fileName.find("workSpace")>0:
+        #elif self.ui.fileName.find(":")>=0 and self.ui.fileName.find("workSpace")>0:
+        elif self.ui.fileName.find(rootDirectoryPath)>=0 and self.ui.fileName.find("workSpace")>0:
             self.rightClickMenu.addAction(self.openFile)
             self.rightClickMenu.addAction(self.closeFile)
             self.rightClickMenu.addAction(self.deleteFile)
@@ -592,9 +604,9 @@ class myTreeView(QTreeView):
         print("--5--%s"%self.ui.fileName)
 
     def treepressed(self,index):
+        self.chooseFile(index)
         self.dropDir=""
         self.getDropDir(index)
-
 
     def dragEnterEvent(self,event):
         if event.mimeData().hasFormat("text/uri-list")==True:#External drag
@@ -779,6 +791,7 @@ class myTabWidget(QTabWidget):
                 self.fileitem.size-=1
 
     def dragEnterEvent(self,event):
+        print("tabwidget dragenterevent1.")
         if event.mimeData().hasFormat("text/uri-list")==True:#External drag
             event.acceptProposedAction()
         elif event.mimeData().hasFormat("application/x-qabstractitemmodeldatalist")==True:#Internal drag
@@ -790,6 +803,7 @@ class myTabWidget(QTabWidget):
     def dragLeaveEvent(self,event):
         pass
     def dropEvent(self,event):
+        print("tabwidget dropevent1.")
         if event.mimeData().hasUrls:
             urls=event.mimeData().urls()
             dropOpenFileName=""
@@ -812,14 +826,17 @@ class myTabWidget(QTabWidget):
     def createNewTab(self,filename,msg,lexer):
         if type(msg) is bytes:
             msg=msg.decode(encoding='utf-8')
-        if str(msg).find("\r\n")>=0:
-            msg=msg.replace('\n','')
-        elif str(msg).find("\n")>=0 and str(msg).find("\r")<0:
-            msg=msg.replace("\n","\r")
-        else:
-            print("creatNewTab has other endswith.")
+        #if str(msg).find("\r\n")>=0:
+        #    msg=msg.replace('\n','')
+        #elif str(msg).find("\n")>=0 and str(msg).find("\r")<0:
+        #    msg=msg.replace("\n","\r")
+        #else:
+        #    print("creatNewTab has other endswith.")
+        msg=msg.replace("\r\n","\r")
+        msg=msg.replace("\n","\r")
 
-        editor=QsciScintilla()
+        #editor=QsciScintilla()
+        editor=myQsciScintilla()
         editor.setUtf8(True)
         editor.setLexer(lexer)
         editor.setMarginsBackgroundColor(QColor(220,220,220))
@@ -843,7 +860,8 @@ class myTabWidget(QTabWidget):
             self.setTabIcon(self.count()-1, QIcon(':/pc.png'))
             if self.ui.currentBoard=="microbit":
                 msg="from microbit import *\r#write your program:\r"
-        elif str(filename).find(":")>0:
+        #elif str(filename).find(":")>0:
+        elif str(filename).find(rootDirectoryPath)>=0:
             self.tabBar().setTabTextColor(self.count()-1, QColor(Qt.red))
             self.setTabIcon(self.count()-1, QIcon(':/pc.png'))
         else:
@@ -921,6 +939,9 @@ class myTabWidget(QTabWidget):
         if filename!="untitled":
             self.fileitem.size+=1
             self.fileitem.list.append(filename)
+
+
+        self.connect(editor,SIGNAL("dragOpenFile"),self.dragOpenFile)
 
         self.connect(editor,SIGNAL("textChanged()"),self.editorTextChange)
         self.connect(editor,SIGNAL("selectionChanged()"),self.selectionChanged)
@@ -1067,35 +1088,34 @@ class myTabWidget(QTabWidget):
             self.currentWidget().insertAt(text[str(text).find(linetext)+len(linetext):],self.line,self.index)
             self.currentWidget().setCursorPosition(self.line,self.index+len(text[str(text).find(linetext)+len(linetext):]))
 
+    def dragOpenFile(self,filename):
+        if filename.find(".py")<0 and filename.find(".txt")<0 and\
+          filename.find(".json")<0 and filename.find(".ini")<0:
+            print("current version can not open this file.")
+            return
+        else:
+            self.ui.pcOpenFile(filename)
 
+class myQsciScintilla(QsciScintilla):
+    def __init__(self,parent=None):
+        super(myQsciScintilla,self).__init__(parent)
 
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    def dragEnterEvent(self,event):
+        print("tabwidget dragenterevent2.")
+        if event.mimeData().hasFormat("text/url-list")==True:
+            event.acceptProposedAction()
+        else:
+            event.ignore()
+    def dragMoveEvent(self,event):
+        event.acceptProposedAction()
+    def dropEvent(self,event):
+        print("tabwidget dropevent2.")
+        if event.mimeData().hasUrls:
+            urls=event.mimeData().urls()
+            dropOpenFileName=""
+            for url in urls:
+                dropOpenFileName=url.toLocalFile()
+            self.emit(SIGNAL("dragOpenFile"),dropOpenFileName)
 
 
 
