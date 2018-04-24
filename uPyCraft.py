@@ -12,6 +12,7 @@ import sys
 import math
 import json
 import os
+import Esp
 import shutil
 import webbrowser
 import qrc_resources
@@ -20,6 +21,7 @@ import platform
 import threading
 import urllib
 import subprocess
+from subprocess import check_output
 import codecs
 import socket
 import ctypes
@@ -164,6 +166,9 @@ class MainWidget(QMainWindow):
         global timer
         timer=threading.Timer(1,self.fun_timer)
         self.connect(self,SIGNAL("timerCloseTerminal"),self.timerCloseTerminal)
+        self.connect(self,SIGNAL("timerAddComMenu"),self.timerAddComMenu)
+        self.connect(self,SIGNAL("timerSetComMenu"),self.timerSetComMenu)
+        self.connect(self,SIGNAL("timerClearComMenu"),self.timerClearComMenu)
         timer.start()
         
 #check version(IDE,examples)
@@ -177,10 +182,13 @@ class MainWidget(QMainWindow):
         self.check.start()
 
     def setFont(self):
-        if sys.platform.startswith('win') or sys.platform.startswith('cygwin'):
+        fonts=None
+        if sys.platform.startswith('win32') or sys.platform.startswith('cygwin'):
             FONTDIRS=os.path.join(os.environ['WINDIR'],'Fonts')
             fonts=os.listdir(FONTDIRS)
             flags=False
+        if fonts==None:
+            return
         for filename in fonts:
             if(filename.upper().find('MONACO.TTF')==0):
                 flags=True
@@ -744,7 +752,8 @@ class MainWidget(QMainWindow):
             self.terminal.append("current version only open py txt json ini file.")
             return
         
-        if self.fileName.find(":")>=0:
+        #if self.fileName.find(":")>=0:
+        if self.fileName.find(rootDirectoryPath)>=0:
             self.pcOpenFile(self.fileName)
             return
         else:
@@ -772,11 +781,12 @@ class MainWidget(QMainWindow):
             print(filepath)
             if tabname[0] != "*":#tabname have *,means it's changed,can be save
                 return
-            elif filepath.find(":")<0:
+            #elif filepath.find(":")<0:
+            elif filepath.find(rootDirectoryPath)<0:
                 savefile=codecs.open(currentTempPath+str(filepath),'wb')
             else:
                 savefile=open(filepath,'wb')
-            
+            '''
             if self.saveStr.find("\r\n")>=0:
                 self.saveStr = self.saveStr.replace("\n","")
             elif self.saveStr.find("\r\n")<0 and self.saveStr.find("\n")>0:
@@ -787,7 +797,9 @@ class MainWidget(QMainWindow):
                 self.saveStr = self.saveStr.replace("\n","\r")
             else:
                 print("Err for slotSaveFile")
-            
+            '''
+            self.saveStr=self.saveStr.replace("\r\n","\r")
+            self.saveStr=self.saveStr.replace("\n","\r")
             saveStrSplit = self.saveStr.split("\r")
             self.saveStr=""
             for i in saveStrSplit:
@@ -808,7 +820,7 @@ class MainWidget(QMainWindow):
         if filename:
             self.saveStr=self.tabWidget.currentWidget().text()
             savefile=open(filename,'wb')
-
+            '''
             if self.saveStr.find("\r\n")>=0:
                 self.saveStr = self.saveStr.replace("\n","")
             elif self.saveStr.find("\r\n")<0 and self.saveStr.find("\n")>0:
@@ -819,7 +831,9 @@ class MainWidget(QMainWindow):
                 self.saveStr = self.saveStr.replace("\n","\r")
             else:
                 print("Err for slotSaveFile")
-            
+            '''
+            self.saveStr=self.saveStr.replace("\r\n","\r")
+            self.saveStr=self.saveStr.replace("\n","\r")
             saveStrSplit = self.saveStr.split("\r")
             self.saveStr=""
             for i in saveStrSplit:
@@ -874,7 +888,7 @@ class MainWidget(QMainWindow):
         self.fileName=self.workspacePath+"/"+tabname
         self.str = self.tabWidget.currentWidget().text()
         savefile=open(self.fileName,'wb')
-
+        '''
         if self.saveStr.find("\r\n")>=0:
             self.saveStr = self.saveStr.replace("\n","")
         elif self.saveStr.find("\r\n")<0 and self.saveStr.find("\n")>0:
@@ -885,7 +899,9 @@ class MainWidget(QMainWindow):
             self.saveStr = self.saveStr.replace("\n","\r")
         else:
             print("Err for slotSaveFile")
-
+        '''
+        self.saveStr=self.saveStr.replace("\r\n","\r")
+        self.saveStr=self.saveStr.replace("\n","\r")
         saveStrSplit = self.saveStr.split("\r")
         self.saveStr=""
         for i in saveStrSplit:
@@ -919,9 +935,10 @@ class MainWidget(QMainWindow):
         #self.createWorkSpaceMenu()
 
     def slotTreeModel(self):
+        self.createUpyLibMenu()
         self.createWorkSpaceMenu()
         if not self.myserial.ser.isOpen():
-            self.terminal.append("serial not open")
+            #self.terminal.append("serial not open")
             return
         self.uitoctrlQueue.put("treeModel")
 
@@ -1034,7 +1051,15 @@ class MainWidget(QMainWindow):
                         continue
                     if i.find("undefined name 'const'")>=0:
                         continue
-                    self.tabWidget.currentWidget().markerAdd((int(i.split(":")[2])-1),1)
+
+                    if sys.platform=="win32":
+                        self.tabWidget.currentWidget().markerAdd((int(i.split(":")[2])-1),1)
+                    elif sys.platform=="linux":
+                        self.tabWidget.currentWidget().markerAdd((int(i.split(":")[1])-1),1)
+                    else:
+                        print("other platform1.")
+                        return
+
                     i=i.split(":")
                     appendMsg=self.tabWidget.tabText(self.tabWidget.currentTab)
                     for n in range(0,len(i)):
@@ -1043,6 +1068,7 @@ class MainWidget(QMainWindow):
                     self.terminal.append(appendMsg)
                         
                 self.tabWidget.currentWidget().setMarkerBackgroundColor(QColor(255,204,204))
+
             if stderr=="":
                 pass
             else:
@@ -1052,7 +1078,13 @@ class MainWidget(QMainWindow):
                     if i=="":
                         continue
                     if i.find("syntaxCheck.py")>0:
-                        self.tabWidget.currentWidget().markerAdd((int(i.split(":")[2])-1),1)
+                        if sys.platform=="win32":
+                            self.tabWidget.currentWidget().markerAdd((int(i.split(":")[2])-1),1)
+                        elif sys.platform=="linux":
+                            self.tabWidget.currentWidget().markerAdd((int(i.split(":")[1])-1),1)
+                        else:
+                            print("other platform2.")
+                            return
                         i=i.split(":")
                         appendMsg=self.tabWidget.tabText(self.tabWidget.currentTab)
                         for n in range(0,len(i)):
@@ -1098,6 +1130,9 @@ class MainWidget(QMainWindow):
         if self.findmsg.replaceToEdit.text()=="":
             #self.terminal.append("Please input replace to")
             return
+        if self.findmsg.replaceStartEdit.text()==self.findmsg.replaceToEdit.text():
+            QMessageBox.information(self,self.tr("attention"),self.tr("the same msg could not be replace!"),QMessageBox.Ok)
+            return
         
         if self.tabWidget.currentWidget().findFirst(self.findmsg.replaceStartEdit.text(),False,True,True,True)==False:
             #self.terminal.append("can\'t find \'%s\'"%self.findmsg.replaceStartEdit.text())
@@ -1110,6 +1145,8 @@ class MainWidget(QMainWindow):
     def slotChooseCom(self,action):
         if self.myserial.ser.isOpen():
             self.terminal.append("serial already opened")
+            self.serialConnect.setVisible(False)
+            self.serialClose.setVisible(True)
             return
         try:
             self.myserial.comChooseOk(action.text())
@@ -1145,7 +1182,7 @@ class MainWidget(QMainWindow):
                     break
             time.sleep(0.1)
             endTime=time.time()
-            if endTime-startTime > 5:
+            if endTime-startTime > 3:
                 self.terminal.append("open serial error, please try again.")
                 self.myserial.ser.close()
                 if not self.myserial.ser.isOpen():
@@ -1265,7 +1302,7 @@ class MainWidget(QMainWindow):
                     break
             time.sleep(0.1)
             endTime=time.time()
-            if endTime-startTime > 5:
+            if endTime-startTime > 3:
                 self.terminal.append("open serial error, please try again.")
                 self.myserial.ser.close()
                 if not self.myserial.ser.isOpen():
@@ -1348,6 +1385,8 @@ class MainWidget(QMainWindow):
         self.comActionGroup.setDisabled(False)  #enable choose serial
         if not self.myserial.ser.isOpen():
             self.terminal.append("already close.")
+            self.serialConnect.setVisible(True)
+            self.serialClose.setVisible(False)
             self.currentCom=""
             return
 
@@ -1357,7 +1396,7 @@ class MainWidget(QMainWindow):
         self.uitoctrlQueue.put("close")
         time.sleep(0.1)
         
-        self.currentCom=""
+        #self.currentCom=""
         self.rootDir="."
         self.terminal.setReadOnly(True)
 
@@ -1384,8 +1423,11 @@ class MainWidget(QMainWindow):
 
         self.emit(SIGNAL("initRecvdata"))
         self.emit(SIGNAL("initMessycode"))
-
+        time.sleep(0.1)
         self.myserial.ser.close()
+        if self.currentBoard=="esp32" or self.currentBoard=="esp8266":
+            Esp.espCloseReset(self.currentCom,self.currentBoard)
+        self.currentCom=""
         self.terminal.setEventFilterEnable(False)
 
     def slotToolMenuHover(self,action):
@@ -1429,7 +1471,8 @@ class MainWidget(QMainWindow):
             self.inDownloadFile=False
             return False
 
-        if str(self.fileName).find(":")>=0:
+        #if str(self.fileName).find(":")>=0:
+        if str(self.fileName).find(rootDirectoryPath)>=0:
             afile=self.fileName
         else:
             afile=self.fileName
@@ -1590,7 +1633,13 @@ class MainWidget(QMainWindow):
         print("pcOpenFile:%s"%filename)
         if os.path.isdir(filename)==True:
             if str(filename).split("/")[-1]=="workSpace":
-                os.startfile(str(filename))
+                if sys.platform=="win32":
+                    os.startfile(str(filename))
+                elif sys.platform=="linux":
+                    #subprocess.call(["open",str(filename)])
+                    webbrowser.open(filename)
+                else:
+                    print("other platform3.")
             return
 
         if not self.editClassFileitem(filename):
@@ -1617,7 +1666,8 @@ class MainWidget(QMainWindow):
                         self.tabWidget.setCurrentWidget(self.tabWidget.widget(j))
                 print("%s already exist"%filename)
                 return False
-        if str(filename).find(":")<0:
+        #if str(filename).find(":")<0:
+        if str(filename).find(rootDirectoryPath)<0:
             return True
         return True
             
@@ -1891,7 +1941,7 @@ class MainWidget(QMainWindow):
         self.goProgram(self.fileName)
 
     def treeRightMenuOpenFile(self):
-        if str(self.fileName).find(":")>0:
+        if str(self.fileName).find(rootDirectoryPath)>=0:
             self.pcOpenFile(self.fileName)
             return
         
@@ -1920,7 +1970,8 @@ class MainWidget(QMainWindow):
     def treeRightMenuDeleteFile(self):
         if self.fileName=='':
             return
-        if str(self.fileName).find(":")>0:
+        #if str(self.fileName).find(":")>0:
+        if str(self.fileName).find(rootDirectoryPath)>=0:        
             self.deletePCFile(self.fileName)
             return
         
@@ -1941,7 +1992,8 @@ class MainWidget(QMainWindow):
         if not self.myserial.ser.isOpen():
             return
 
-        if str(self.fileName).find(":")>0:
+        #if str(self.fileName).find(":")>0:
+        if str(self.fileName).find(rootDirectoryPath)>=0:  
             self.terminal.append("This file not in board")
             return
         elif str(self.fileName).find(".py")<0:
@@ -1953,7 +2005,8 @@ class MainWidget(QMainWindow):
         self.uitoctrlQueue.put("setdefaultprogram:::%s"%self.myDefaultProgram)
 
     def treeRightMenuRename(self):
-        if str(self.fileName).find(":")>0:
+        #if str(self.fileName).find(":")>0:
+        if str(self.fileName).find(rootDirectoryPath)>=0:  
             self.terminal.append("not in board,no rename")
             return
         
@@ -1966,7 +2019,8 @@ class MainWidget(QMainWindow):
         self.getTreeRightMenuRename.exec_()
 
     def treeRightMenuNewDir(self):
-        if str(self.fileName).find(":")>0:
+        #if str(self.fileName).find(":")>0:
+        if str(self.fileName).find(rootDirectoryPath)>=0:  
             self.terminal.append("not board file,no new dir")
             return
         if not self.myserial.ser.isOpen():
@@ -2054,6 +2108,9 @@ class MainWidget(QMainWindow):
                 self.connect(self.firmwareAny,SIGNAL("firmwareAnyUpdate"),self.firmwareAnyUpdate)
                 self.connect(self.firmwareAny,SIGNAL("goMicrobitUpdate"),self.microbitUpdate)
                 self.firmwareAny.start()
+                return
+            else:
+                self.terminal.append("hope to connect internet and try again.")
                 return
         else:
             if self.updateBin.firmwareName.text()!="":
@@ -2147,10 +2204,21 @@ class MainWidget(QMainWindow):
                                     QMessageBox.Ok|QMessageBox.Cancel,  
                                     QMessageBox.Ok)
         if microbitUP==QMessageBox.Ok:
-            if self.get_fs_info(self.firmwareSavePath):
-                QMessageBox.information(self,self.tr("microbit update"),self.tr("update ok"),QMessageBox.Ok)
+            if os.name == "posix":
+                mount_output=check_output("mount").splitlines()
+                mounted_volumes=[x.split()[2] for x in mount_output]
+                for volume in mounted_volumes:
+                   if volume.endswith(b'MICROBIT'):
+                       volume=volume.decode('utf-8')
+                       shutil.copyfile(self.firmwareSavePath,volume+"/microbit.hex")
+                       break
+            elif os.name == "nt":
+                if self.get_fs_info(self.firmwareSavePath):
+                    QMessageBox.information(self,self.tr("microbit update"),self.tr("update ok"),QMessageBox.Ok)
+                else:
+                    QMessageBox.information(self,self.tr("microbit update"),self.tr("update false"),QMessageBox.Ok)
             else:
-                QMessageBox.information(self,self.tr("microbit update"),self.tr("update false"),QMessageBox.Ok)
+                print("system not support.")
         else:
             pass
 
@@ -2287,6 +2355,7 @@ class MainWidget(QMainWindow):
             self.terminal.append("reflush tree error")
             self.inDownloadFile=False
             return
+        print("reflushTree=====================%s"%data)
         row=self.rootDevice.rowCount()
         self.rootDevice.removeRows(0,row)
 
@@ -2299,7 +2368,8 @@ class MainWidget(QMainWindow):
 
         if self.isDownloadFileAndRun:
             self.isDownloadFileAndRun=False
-            if str(self.fileName).find(":")>=0:
+            #if str(self.fileName).find(":")>=0:
+            if str(self.fileName).find(rootDirectoryPath)>=0:
                 goProgramFile = str(self.fileName).split("/")[-1]
             else:
                 goProgramFile=self.fileName
@@ -2534,6 +2604,18 @@ class MainWidget(QMainWindow):
         self.terminal.setReadOnly(True)
         self.terminal.setEventFilterEnable(False)
 
+    def timerAddComMenu(self,port):
+        port=QAction(port,self)
+        port.setCheckable(True)
+        self.comMenu.addAction(self.comActionGroup.addAction(port))
+    def timerSetComMenu(self,port):
+        port=QAction(port,self)
+        port.setCheckable(True)
+        self.comMenu.addAction(port)
+        self.comMenuTools.setMenu(self.comMenu)
+    def timerClearComMenu(self):
+        self.comMenu.clear()
+
     def fun_timer(self):
         global timer
         if self.timerClose:
@@ -2544,21 +2626,16 @@ class MainWidget(QMainWindow):
             if i in self.serialComList:
                 continue
             self.serialComList.append(i)
-            i=QAction(i,self)
-            i.setCheckable(True)
-            self.comMenu.addAction(self.comActionGroup.addAction(i))
+
+            self.emit(SIGNAL("timerAddComMenu"),i)
 
         for i in self.serialComList:
             if i not in mylist:
                 self.serialComList.remove(i)
-                self.comMenu.clear()
+                self.emit(SIGNAL("timerClearComMenu"))
+                time.sleep(0.1)
                 for j in self.serialComList:
-                    j=QAction(j,self)
-                    j.setCheckable(True)
-                    self.comMenu.addAction(j)
-
-                    self.comMenuTools.setMenu(self.comMenu)
-
+                    self.emit(SIGNAL("timerSetComMenu"),j)
         if self.currentCom=="":
             self.serialConnect.setVisible(True)
             self.serialClose.setVisible(False)

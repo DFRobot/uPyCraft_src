@@ -195,7 +195,8 @@ class ctrlAction(QThread):
                 
         
     def dragChangeDir(self,dragfile,dropfile):
-        if str(dragfile).find(":")<0:#device Internal move
+        #if str(dragfile).find(":")<0:#device Internal move
+        if str(dragfile).find(rootDirectoryPath)<0:
             dropfile=dropfile + "/" + dragfile.split("/")[-1]
             self.rename(dragfile,dropfile)
         else:#device external drag and download
@@ -822,7 +823,8 @@ class ctrlAction(QThread):
         if str(filename).find("/")<0:
             pass
         else:
-            if str(filename).find(":")>=0:
+            #if str(filename).find(":")>=0:
+            if str(filename).find(rootDirectoryPath)>=0:
                 filelist=str(filename).split('/')
                 for afile in filelist:
                     if afile.find(".py")>=0:
@@ -882,6 +884,8 @@ class ctrlAction(QThread):
             return
 
         self.loadfileMsg=self.loadFileMsg.replace("\r\n","\r")
+        self.loadfileMsg=self.loadFileMsg.replace("\n","\r")
+        
         myList=self.loadFileMsg.split('\r')
 
         appendMsg=''
@@ -894,7 +898,7 @@ class ctrlAction(QThread):
             elif lenth==len(myList):   #delete endless '>>>'
                 pass
             else:
-                appendMsg+=str(myList[lenth-1])+"\r"    #use [lenth-1],len=3,list have [0][1][2]
+                appendMsg+=str(myList[lenth-1])+"\r\n"    #use [lenth-1],len=3,list have [0][1][2]
             lenth+=1
 
         filenameB=filename.split("/")
@@ -927,7 +931,8 @@ class ctrlAction(QThread):
         if str(filename).find(".py")>=0:
             if self.dragDropModel==True:
                 afile=self.dropDownFileName
-            elif str(filename).find(":")<0:
+            #elif str(filename).find(":")<0:
+            elif str(filename).find(rootDirectoryPath)<0:
                 afile=str(filename)
             else:
                 if str(filename).find("/")>=0:
@@ -948,7 +953,8 @@ class ctrlAction(QThread):
                 self.emit(SIGNAL("uiRecvFromCtrl"),"no suport for download dir")
                 return
             afile=self.dropDownFileName
-        elif filename.find(":")<0:
+        #elif filename.find(":")<0:
+        elif filename.find(rootDirectoryPath)<0:
             fileHandle=open(currentTempPath+filename,'rbU')
         else:
             myfile=open(currentTempPath+"/"+str(filename.split("/")[-1]),"w",encoding='UTF-8')
@@ -1005,7 +1011,7 @@ class ctrlAction(QThread):
                 fileHandle.close()
                 self.downloadFileBool=False
                 self.downloadFileMsg=""
-                self.emit(SIGNAL("uiRecvFromCtrl"),"download false1")
+                self.emit(SIGNAL("uiRecvFromCtrl"),"download false")
                 return
         if self.downloadFileMsg.find("Traceback")>=0 or self.downloadFileMsg.find("... ")>=0:
             fileHandle.close()
@@ -1015,11 +1021,11 @@ class ctrlAction(QThread):
             if returnData.find("Traceback")>=0:
                 self.emit(SIGNAL("uiRecvFromCtrl"),returnData)
                 time.sleep(0.01)
-                self.emit(SIGNAL("uiRecvFromCtrl"),"download false2")
+                self.emit(SIGNAL("uiRecvFromCtrl"),"download false")
             else:
                 self.ctrltouartQueue.put("ctrltouart:::\x03")
                 time.sleep(0.01)
-                self.emit(SIGNAL("uiRecvFromCtrl"),"download false3")
+                self.emit(SIGNAL("uiRecvFromCtrl"),"download false")
             return
 
         ##################
@@ -1038,10 +1044,12 @@ class ctrlAction(QThread):
                     self.downloadFileMsg=""
                     try:
                         aline=aline.decode()
-                        if aline.find("\r\n")<0 and aline.find("\n")>=0:
-                            aline=aline.replace("\n","\r")
-                        elif aline.find("\r\n")>=0:
-                            aline=aline.replace("\n","")
+                        #if aline.find("\r\n")<0 and aline.find("\n")>=0:
+                        #    aline=aline.replace("\n","\r")
+                        #elif aline.find("\r\n")>=0:
+                        #    aline=aline.replace("\n","")
+                        aline=aline.replace("\r\n","\r")
+                        aline=aline.replace("\n","\r")
                         aline="myfile.write(%s)\r"%repr(aline)
                     except:
                         aline="myfile.write(%s)\r"%repr(aline)
@@ -1052,11 +1060,12 @@ class ctrlAction(QThread):
                     try:
                         aline=aline.decode()
                         
-                        if aline.find("\r\n")<0 and aline.find("\\n")>=0:
-                            aline=aline.replace("\n","\r")
-                        elif aline.find("\r\n")>=0:
-                            aline=aline.replace("\n","")
-                        
+                        #if aline.find("\r\n")<0 and aline.find("\\n")>=0:
+                        #    aline=aline.replace("\n","\r")
+                        #elif aline.find("\r\n")>=0:
+                        #    aline=aline.replace("\n","")
+                        aline=aline.replace("\r\n","\r")
+                        aline=aline.replace("\n","\r")
                         aline=aline.encode('utf-8')
                         self.emit(SIGNAL("uiRecvFromCtrl"),".")
                         self.downloadFileMsg=""
@@ -1067,7 +1076,7 @@ class ctrlAction(QThread):
                         self.ctrltouartQueue.put("ctrltouart:::myfile.write(%s)\r\n"%aline)
                 
                 startTime=time.time()
-                while 1:#if this place is false，think about that Whether join err deal with self.downFileFalseDeal(afile)
+                while 1:#if this place is false锛宼hink about that Whether join err deal with self.downFileFalseDeal(afile)
                     if self.downloadFileMsg=="":
                         time.sleep(0.005)
                     else:
@@ -1246,14 +1255,11 @@ class ctrlAction(QThread):
         for i in aline:
             self.ctrltouartQueue.put("ctrltouart:::%s"%i)
             time.sleep(0.001)
-
-
         
         result=self.treeWaitUart()
         if result=="err":
             return result
-        print(self.reflushTreeMsg)
-
+        
         if self.reflushTreeMsg.find("Traceback")>=0 or self.reflushTreeMsg.find("... ")>=0:
             self.reflushTreeBool=False
             returnData=self.reflushTreeMsg
