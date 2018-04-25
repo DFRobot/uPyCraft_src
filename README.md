@@ -42,7 +42,7 @@ This requires you to have python3.4, pyqt4, py2exe, qsci, pyserial and pyflakes 
 Open uPyCraft.py with python3.4 IDE, click the run module button/F5 to run.
 
 ## Package uPyCraft
-uPyCraft.exe will created in directory dist/ .
+uPyCraft.exe will be created in directory dist/ .
 
 
 
