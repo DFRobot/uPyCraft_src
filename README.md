@@ -41,7 +41,7 @@ This requires you to have python3.4, pyqt4, py2exe, qsci, pyserial and pyflakes 
 ## Running
 Open uPyCraft.py with python3.4 IDE, click the run module button/F5 to run.
 
-## pakege uPyCraft
+## Package uPyCraft
 uPyCraft.exe will created in directory dist/ .
 
 
@@ -68,6 +68,6 @@ Download PyQt4_gpl_x11-4.12 from https://sourceforge.net/projects/pyqt/files/PyQ
     sudo python configure.py
     sudo make
     sudo make install
-### Pakege uPyCraft<br>
+### Package uPyCraft<br>
     pip install pyinstaller
     pyinstaller -F uPycraft.py
