@@ -50,12 +50,14 @@ uPyCraft.exe will created in directory dist/ .
 ## Environment
 ubuntu16.04 LTS  Python3.5
 ## Install
-### SIP
-Download from SIP from https://riverbankcomputing.com/software/sip/download<br>
+### SIP<br>
+Download from SIP from https://riverbankcomputing.com/software/sip/download <br>
+
     tar zxvf sip-4.19.tar.gz -C /home/PyQt<br>
     sudo python configure.py<br>
     sudo make install<br>
-###QT support
-sudo apt-get install qt4-dev-tools qt4-doc qt4-qtconfig qt4-demos qt4-designer<br>
-sudo apt-get install libqwt5-qt4 libqwt5-qt4-dev<br>
+### QT support<br>
+
+    sudo apt-get install qt4-dev-tools qt4-doc qt4-qtconfig qt4-demos qt4-designer<br>
+    sudo apt-get install libqwt5-qt4 libqwt5-qt4-dev<br>
 
