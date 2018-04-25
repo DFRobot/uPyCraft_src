@@ -62,4 +62,12 @@ Download from SIP from https://riverbankcomputing.com/software/sip/download <br>
     sudo apt-get install libqwt5-qt4 libqwt5-qt4-dev
 ### PyQt4<br>
 Download PyQt4_gpl_x11-4.12 from https://sourceforge.net/projects/pyqt/files/PyQt4/ <br>
+
     tar zxvf PyQt4_gpl_x11-4.12.tar.gz -C /home/PyQt
+    cd /home/PyQt/PyQt4_gpl_x11-4.12
+    sudo python configure.py
+    sudo make
+    sudo make install
+### pakege uPyCraft<br>
+    pip install pyinstaller
+    pyinstaller -F uPycraft.py
