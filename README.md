@@ -48,7 +48,7 @@ uPyCraft.exe will created in directory dist/ .
 
 # Linux
 ## Environment
-ubuntu16.04 LTS  Python3.5
+ubuntu16.04 LTS     Python3.5   PyQt4
 ## Install
 ### SIP<br>
 Download from SIP from https://riverbankcomputing.com/software/sip/download <br>
