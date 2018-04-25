@@ -55,4 +55,7 @@ Download from SIP from https://riverbankcomputing.com/software/sip/download<br>
     tar zxvf sip-4.19.tar.gz -C /home/PyQt<br>
     sudo python configure.py<br>
     sudo make install<br>
+###QT support
+sudo apt-get install qt4-dev-tools qt4-doc qt4-qtconfig qt4-demos qt4-designer<br>
+sudo apt-get install libqwt5-qt4 libqwt5-qt4-dev<br>
 
