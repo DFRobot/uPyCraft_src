@@ -60,4 +60,6 @@ Download from SIP from https://riverbankcomputing.com/software/sip/download <br>
 
     sudo apt-get install qt4-dev-tools qt4-doc qt4-qtconfig qt4-demos qt4-designer
     sudo apt-get install libqwt5-qt4 libqwt5-qt4-dev
-
+### PyQt4<br>
+Download PyQt4_gpl_x11-4.12 from https://sourceforge.net/projects/pyqt/files/PyQt4/ <br>
+    tar zxvf PyQt4_gpl_x11-4.12.tar.gz -C /home/PyQt
