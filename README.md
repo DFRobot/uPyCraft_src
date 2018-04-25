@@ -54,5 +54,5 @@ ubuntu16.04 LTS  Python3.5
 Download from SIP from https://riverbankcomputing.com/software/sip/download<br>
     tar zxvf sip-4.19.tar.gz -C /home/PyQt<br>
     sudo python configure.py<br>
-    sudo make install <br>
+    sudo make install<br>
 
