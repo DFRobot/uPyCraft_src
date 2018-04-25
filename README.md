@@ -16,7 +16,9 @@ This requires you to have python3.4, pyqt4, py2exe, qsci, pyserial and pyflakes 
     pyserial:pip install pyserial 
     
     py2exe  :pip install py2exe 
-    
+        /Python34/Lib/site-packages/py2exe/icons.py Modify lines89：
+            if iconheader.idCount>10 -> if iconheader.idCount>20
+   
     pyflakes:pip install pyflakes 
         find api.py and replace with pyflakesChange/api.py 
     
