@@ -1,5 +1,5 @@
 # uPyCraft_src
-#### uPyCraft is an IDE designed for micropython that supports Windows 7, Windows 8, Windows 10, MAC OSX 10.11, and above.To make it easier for users to use, uPyCraft is released in green in all systems, no need to install.
+#### uPyCraft is an IDE designed for micropython that supports Windows 7, Windows 8, Windows 10, Linux, MAC OSX 10.11, and above.To make it easier for users to use, uPyCraft is released in green in all systems, no need to install.
 
 # Windows
 ## Installation
