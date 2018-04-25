@@ -43,4 +43,9 @@ Open uPyCraft.py with python3.4 IDE, click the run module button/F5 to run.
 
 ## pakege uPyCraft
 uPyCraft.exe will created in directory dist/ .
-  
+
+
+
+## Linux
+## environment
+ubuntu16.04 LTS
