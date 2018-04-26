@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import os.path
 import sys
 import time
 import threading
@@ -835,26 +836,26 @@ class ctrlAction(QThread):
             
         if self.currentBoard=="microbit":
             if str(filename).find("./")>=0:
-                aline="exec(open('%s').read(),globals())"%str(filename[2:])
+                aline="exec(open('%s').read(),globals())"%str(os.path.split(filename)[1])
             else:
-                aline="exec(open('%s').read(),globals())"%str(filename)
+                aline="exec(open('%s').read(),globals())"%str(os.path.split(filename)[1])
             for i in aline:
                 self.ctrltouartQueue.put("uitouart:::%s"%i)
                 time.sleep(0.001)
             self.ctrltouartQueue.put("exec_:::\r")
         else:
-            self.ctrltouartQueue.put("exec_:::exec(open(\'%s\').read(),globals())\r\n"%str(filename))
+            self.ctrltouartQueue.put("exec_:::exec(open(\'%s\').read(),globals())\r\n"%str(os.path.split(filename)[1]))
 
     def loadFile(self,filename):
         self.loadFileBool=True
         self.loadFileMsg=""
         if self.currentBoard=="microbit":
-            aline="print(open('%s','r').read())\r"%str(filename[2:])
+            aline="print(open('%s','r').read())\r"%str(os.path.split(filename)[1])
             for i in aline:
                 self.ctrltouartQueue.put("ctrltouart:::%s"%i)
                 time.sleep(0.001)
         else:
-            self.ctrltouartQueue.put("ctrltouart:::print(open(\'%s\',\'rU\').read())\r\n"%str(filename))
+            self.ctrltouartQueue.put("ctrltouart:::print(open(\'%s\',\'rU\').read())\r\n"%str(os.path.split(filename)[1]))
 
         startTime=time.time()
         while 1:
@@ -954,7 +955,7 @@ class ctrlAction(QThread):
                 return
             afile=self.dropDownFileName
         #elif filename.find(":")<0:
-        elif filename.find(rootDirectoryPath)<0:
+        elif filename.find(rootDirectoryPath)<0 and os.path.isabs(filename) == False:
             fileHandle=open(currentTempPath+filename,'rbU')
         else:
             myfile=open(currentTempPath+"/"+str(filename.split("/")[-1]),"w",encoding='UTF-8')
@@ -998,7 +999,7 @@ class ctrlAction(QThread):
                 self.ctrltouartQueue.put("ctrltouart:::%s"%i)
                 time.sleep(0.001)
         else:
-            self.ctrltouartQueue.put("ctrltouart:::myfile=open(\'%s\',\'w\')\r\n"%str(afile))
+            self.ctrltouartQueue.put("ctrltouart:::myfile=open(\'%s\',\'w\')\r\n"%str(os.path.split(afile)[1]))
         
         startTime=time.time()
         while 1:

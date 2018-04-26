@@ -12,6 +12,7 @@ import sys
 import math
 import json
 import os
+import os.path
 import Esp
 import shutil
 import webbrowser
@@ -1472,7 +1473,7 @@ class MainWidget(QMainWindow):
             return False
 
         #if str(self.fileName).find(":")>=0:
-        if str(self.fileName).find(rootDirectoryPath)>=0:
+        if os.path.isabs(self.fileName):
             afile=self.fileName
         else:
             afile=self.fileName
