@@ -70,4 +70,4 @@ Download PyQt4_gpl_x11-4.12 from https://sourceforge.net/projects/pyqt/files/PyQ
     sudo make install
 ### Package uPyCraft<br>
     pip install pyinstaller
-    pyinstaller -F uPycraft.py
+    pyinstaller -F uPyCraft.py
