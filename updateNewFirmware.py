@@ -103,6 +103,11 @@ class updateNewFirmware(QDialog):
         self.boardComboBox.addItems(["esp8266","esp32","microbit"])
         self.boardComboBox.setCurrentIndex(2)
 
+        self.burnAddrLabel=QLabel(self.tr("burn_addr"))
+        self.burnAddrComboBox=QComboBox()
+        self.burnAddrComboBox.addItems(["0x0","0x1000"])
+        self.burnAddrComboBox.setCurrentIndex(0)
+
         self.eraseflashLabel=QLabel(self.tr("erase_flash"))
         self.eraseComboBox=QComboBox()
         self.eraseComboBox.addItems(["yes","no"])
@@ -136,27 +141,33 @@ class updateNewFirmware(QDialog):
             layout.addWidget(self.boardLabel,0,0)
             layout.addWidget(self.boardComboBox,0,2)
 
-            layout.addWidget(self.eraseflashLabel,1,0)
-            layout.addWidget(self.eraseComboBox,1,2)
+            layout.addWidget(self.burnAddrLabel,1,0)
+            layout.addWidget(self.burnAddrComboBox,1,2)
 
-            layout.addWidget(self.comLabel,2,0)
-            layout.addWidget(self.comChoose,2,2)
+            layout.addWidget(self.eraseflashLabel,2,0)
+            layout.addWidget(self.eraseComboBox,2,2)
+
+            layout.addWidget(self.comLabel,3,0)
+            layout.addWidget(self.comChoose,3,2)
+
+            layout.addWidget(self.myGroupBox,4,0,2,3)
+
+            layout.addWidget(self.okButton,7,0)
+            layout.addWidget(self.cancelButton,7,2)
+        else:
+            layout.addWidget(self.boardLabel,0,0)
+            layout.addWidget(self.boardComboBox,0,2)
+
+            layout.addWidget(self.burnAddrLabel,1,0)
+            layout.addWidget(self.burnAddrComboBox,1,2)
+
+            layout.addWidget(self.eraseflashLabel,2,0)
+            layout.addWidget(self.eraseComboBox,2,2)
 
             layout.addWidget(self.myGroupBox,3,0,2,3)
 
             layout.addWidget(self.okButton,6,0)
             layout.addWidget(self.cancelButton,6,2)
-        else:
-            layout.addWidget(self.boardLabel,0,0)
-            layout.addWidget(self.boardComboBox,0,2)
-
-            layout.addWidget(self.eraseflashLabel,1,0)
-            layout.addWidget(self.eraseComboBox,1,2)
-
-            layout.addWidget(self.myGroupBox,2,0,2,3)
-
-            layout.addWidget(self.okButton,5,0)
-            layout.addWidget(self.cancelButton,5,2)
             
         self.radioUPY.setChecked(True)
         self.firmwareName.setEnabled(False)
@@ -167,6 +178,13 @@ class updateNewFirmware(QDialog):
             self.eraseComboBox.setEnabled(False)
         else:
             self.eraseComboBox.setEnabled(True)
+
+        if self.boardComboBox.currentText()=="esp32":
+            self.burnAddrComboBox.setCurrentIndex(0)
+            self.burnAddrComboBox.setEnabled(True)
+        else:
+            self.burnAddrComboBox.setEnabled(False)
+        
         self.resize(450,200)
         self.setLayout(layout)
 
@@ -196,6 +214,13 @@ class updateNewFirmware(QDialog):
         else:
             self.eraseComboBox.setCurrentIndex(0)
             self.eraseComboBox.setEnabled(True)
+
+        if self.boardComboBox.currentText()=="esp32":
+            self.burnAddrComboBox.setCurrentIndex(0)
+            self.burnAddrComboBox.setEnabled(True)
+        else:
+            self.burnAddrComboBox.setCurrentIndex(0)
+            self.burnAddrComboBox.setEnabled(False)
             
     def chooseOk(self):
         self.close()

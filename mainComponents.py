@@ -525,17 +525,17 @@ class myTreeView(QTreeView):
         elif (self.ui.fileName=="." or self.ui.fileName=="/flash") and not self.ui.myserial.ser.isOpen():
             pass
         elif self.ui.fileName=="/sd" or \
-             (self.ui.fileName.find(rootDirectoryPath)>=0 and self.ui.fileName.split("/")[-1]=="uPy_lib"):
+             (((sys.platform=="linux" and self.ui.fileName.find(rootDirectoryPath)>=0) or (sys.platform=="win32" and self.ui.fileName.find(":")>=0)) and self.ui.fileName.split("/")[-1]=="uPy_lib"):
             pass
         #elif self.ui.fileName.find(":")>=0 and self.ui.fileName.find("uPy_lib")>0:
-        elif self.ui.fileName.find(rootDirectoryPath)>=0 and self.ui.fileName.find("uPy_lib")>0:
+        elif ((sys.platform=="linux" and self.ui.fileName.find(rootDirectoryPath)>=0) or (sys.platform=="win32" and self.ui.fileName.find(":")>=0)) and self.ui.fileName.find("uPy_lib")>0:
             self.rightClickMenu.addAction(self.openFile)
             self.rightClickMenu.addAction(self.closeFile)
         #elif self.ui.fileName.find(":")>=0 and self.ui.fileName.split("/")[-1]=="workSpace":
-        elif self.ui.fileName.find(rootDirectoryPath)>=0 and self.ui.fileName.split("/")[-1]=="workSpace":
+        elif ((sys.platform=="linux" and self.ui.fileName.find(rootDirectoryPath)>=0) or (sys.platform=="win32" and self.ui.fileName.find(":")>=0)) and self.ui.fileName.split("/")[-1]=="workSpace":
             self.rightClickMenu.addAction(self.openFile)
         #elif self.ui.fileName.find(":")>=0 and self.ui.fileName.find("workSpace")>0:
-        elif self.ui.fileName.find(rootDirectoryPath)>=0 and self.ui.fileName.find("workSpace")>0:
+        elif ((sys.platform=="linux" and self.ui.fileName.find(rootDirectoryPath)>=0) or (sys.platform=="win32" and self.ui.fileName.find(":")>=0)) and self.ui.fileName.find("workSpace")>0:
             self.rightClickMenu.addAction(self.openFile)
             self.rightClickMenu.addAction(self.closeFile)
             self.rightClickMenu.addAction(self.deleteFile)
@@ -582,7 +582,7 @@ class myTreeView(QTreeView):
     def chooseFile(self,index):
         self.ui.fileName=""
         self.getQmodelIndexParent(index)
-        
+        print("--4--%s"%self.ui.fileName)
         dirList=self.ui.fileName.split("/")
 
         if dirList[1]=="device":
@@ -596,6 +596,7 @@ class myTreeView(QTreeView):
             if self.ui.createWorkSpacePath():
                 self.ui.fileName=self.ui.workspacePath[0:-10]+self.ui.fileName
                 self.ui.fileName=self.ui.fileName.replace("\\","/")
+                self.ui.fileName=self.ui.fileName.replace("//","/")
             else:
                 self.ui.fileName=""
         else:
@@ -861,7 +862,9 @@ class myTabWidget(QTabWidget):
             if self.ui.currentBoard=="microbit":
                 msg="from microbit import *\r#write your program:\r"
         #elif str(filename).find(":")>0:
-        elif str(filename).find(rootDirectoryPath)>=0:
+        #elif str(filename).find(rootDirectoryPath)>=0:
+        elif (sys.platform=="linux" and str(filename).find(rootDirectoryPath)>=0) or (sys.platform=="win32" and str(filename).find(":")>0):
+        #elif sys.platform=="win32" or sys.platform=="linux":
             self.tabBar().setTabTextColor(self.count()-1, QColor(Qt.red))
             self.setTabIcon(self.count()-1, QIcon(':/pc.png'))
         else:
