@@ -753,13 +753,22 @@ class MainWidget(QMainWindow):
             return
         
         #if self.fileName.find(":")>=0:
-        if self.fileName.find(rootDirectoryPath)>=0:
+        if sys.platform=="linux" and self.fileName.find(rootDirectoryPath)>=0:
             self.pcOpenFile(self.fileName)
             return
+        elif sys.platform=="win32" and self.fileName.find(":")>=0:
+            self.pcOpenFile(self.fileName)
+            return
+        #if self.fileName.find(rootDirectoryPath)>=0 or (self.fileName.find(":")>=0 and sys.platform=="win32"):
+        #    self.pcOpenFile(self.fileName)
+        #    return
         else:
             if self.editClassFileitem(self.fileName):
                 self.uitoctrlQueue.put("loadfile:::%s"%self.fileName)
-                pass       
+                pass
+            else:
+                print("double false")
+        print("double clicked")
 
     def slotNewFile(self):
         self.tabWidget.createNewTab("untitled","",self.lexer)
@@ -782,8 +791,12 @@ class MainWidget(QMainWindow):
             if tabname[0] != "*":#tabname have *,means it's changed,can be save
                 return
             #elif filepath.find(":")<0:
-            elif filepath.find(rootDirectoryPath)<0:
+            elif sys.platform=="linux" and filepath.find(rootDirectoryPath)<0:
                 savefile=codecs.open(currentTempPath+str(filepath),'wb')
+            elif sys.platform=="win32" and  filepath.find(":")<0:
+                savefile=codecs.open(currentTempPath+str(filepath),'wb')
+            #elif filepath.find(rootDirectoryPath)<0:
+            #    savefile=codecs.open(currentTempPath+str(filepath),'wb')
             else:
                 savefile=open(filepath,'wb')
             '''
@@ -1472,11 +1485,15 @@ class MainWidget(QMainWindow):
             return False
 
         #if str(self.fileName).find(":")>=0:
-        if str(self.fileName).find(rootDirectoryPath)>=0:
+        if sys.platform=="linux" and str(self.fileName).find(rootDirectoryPath)>=0:
             afile=self.fileName
+        elif sys.platform=="win32" and str(self.fileName).find(":")>=0:
+            afile=self.fileName
+        #if str(self.fileName).find(rootDirectoryPath)>=0 or (self.fileName.find(":")>=0 and sys.platform=="win32"):
+        #    afile=self.fileName
         else:
             afile=self.fileName
-            myfile=open(str(rootDirectoryPath+afile[1:]),'w',encoding='utf-8')
+            myfile=open(str(currentTempPath+afile[1:]),'w',encoding='utf-8')
             filemsg=self.tabWidget.currentWidget().text()
             if type(filemsg) is bytes:
                 filemsg=filemsg.decode('utf-8')
@@ -1495,6 +1512,7 @@ class MainWidget(QMainWindow):
     def slotStopProgram(self):
         if self.myserial.ser.isOpen():
             self.readwriteQueue.put("uitouart:::\x03")
+            self.inDownloadFile=False
         else:
             self.terminal.append("serial not open")
         
@@ -1667,8 +1685,12 @@ class MainWidget(QMainWindow):
                 print("%s already exist"%filename)
                 return False
         #if str(filename).find(":")<0:
-        if str(filename).find(rootDirectoryPath)<0:
+        if sys.platform=="linux" and str(filename).find(rootDirectoryPath)<0:
             return True
+        elif sys.platform=="win32" and str(filename).find(":")<0:
+            return True
+        #if str(filename).find(rootDirectoryPath)<0:
+        #    return True
         return True
             
     def asciiTOutf8(self,path):
@@ -1941,9 +1963,15 @@ class MainWidget(QMainWindow):
         self.goProgram(self.fileName)
 
     def treeRightMenuOpenFile(self):
-        if str(self.fileName).find(rootDirectoryPath)>=0:
+        if sys.platform=="linux" and str(self.fileName).find(rootDirectoryPath)>=0:
             self.pcOpenFile(self.fileName)
             return
+        elif sys.platform=="win32" and str(self.fileName).find(":")>=0:
+            self.pcOpenFile(self.fileName)
+            return
+        #if str(self.fileName).find(rootDirectoryPath)>=0:
+        #    self.pcOpenFile(self.fileName)
+        #    return
         
         if str(self.fileName).find(".py")>0 or str(self.fileName).find(".txt")>0 or str(self.fileName).find(".json")>0 or str(self.fileName).find(".ini")>0:
             pass
@@ -1971,9 +1999,16 @@ class MainWidget(QMainWindow):
         if self.fileName=='':
             return
         #if str(self.fileName).find(":")>0:
-        if str(self.fileName).find(rootDirectoryPath)>=0:        
+        if sys.platform=="linux" and str(self.fileName).find(rootDirectoryPath)>=0:
             self.deletePCFile(self.fileName)
             return
+        elif sys.platform=="win32" and str(self.fileName).find(":")>0:
+            self.deletePCFile(self.fileName)
+            return
+        
+        #if str(self.fileName).find(rootDirectoryPath)>=0:        
+        #    self.deletePCFile(self.fileName)
+        #    return
         
         deleteText="confirm delete %s?"%str(self.fileName)
 
@@ -1993,12 +2028,24 @@ class MainWidget(QMainWindow):
             return
 
         #if str(self.fileName).find(":")>0:
-        if str(self.fileName).find(rootDirectoryPath)>=0:  
+        if sys.platform=="linux" and str(self.fileName).find(rootDirectoryPath)>=0:
+            self.terminal.append("This file not in board")
+            return
+        elif sys.platform=="win32" and str(self.fileName).find(":")>=0:
             self.terminal.append("This file not in board")
             return
         elif str(self.fileName).find(".py")<0:
             self.terminal.append("only set py file")
             return
+        
+        
+        
+        #if str(self.fileName).find(rootDirectoryPath)>=0:  
+        #    self.terminal.append("This file not in board")
+        #    return
+        #elif str(self.fileName).find(".py")<0:
+        #    self.terminal.append("only set py file")
+        #    return
         
         self.myDefaultProgram=self.fileName
 
@@ -2006,9 +2053,15 @@ class MainWidget(QMainWindow):
 
     def treeRightMenuRename(self):
         #if str(self.fileName).find(":")>0:
-        if str(self.fileName).find(rootDirectoryPath)>=0:  
+        if sys.platform=="linux" and str(self.fileName).find(rootDirectoryPath)>=0:
             self.terminal.append("not in board,no rename")
             return
+        elif sys.platform=="win32" and str(self.fileName).find(":")>0:
+            self.terminal.append("not in board,no rename")
+            return
+        #if str(self.fileName).find(rootDirectoryPath)>=0:  
+        #    self.terminal.append("not in board,no rename")
+        #    return
         
         if not self.myserial.ser.isOpen():
             return
@@ -2020,9 +2073,15 @@ class MainWidget(QMainWindow):
 
     def treeRightMenuNewDir(self):
         #if str(self.fileName).find(":")>0:
-        if str(self.fileName).find(rootDirectoryPath)>=0:  
+        if sys.platform=="linux" and str(self.fileName).find(rootDirectoryPath)>=0:
             self.terminal.append("not board file,no new dir")
             return
+        elif sys.platform=="win32" and str(self.fileName).find(":")>0:
+            self.terminal.append("not board file,no new dir")
+            return
+        #if str(self.fileName).find(rootDirectoryPath)>=0:  
+        #    self.terminal.append("not board file,no new dir")
+        #    return
         if not self.myserial.ser.isOpen():
             return
         if self.currentBoard=="microbit":
@@ -2102,7 +2161,8 @@ class MainWidget(QMainWindow):
                 self.updateFirmwareBar.show()
                 
                 self.firmwareAny=threadDownloadFirmware(url,self.updateBin.boardComboBox.currentText(),self.firmwareSavePath,self.updateFirmwareCom,\
-                                                        self.updateBin.eraseComboBox.currentText(),self.updateSize,self)
+                                                        self.updateBin.eraseComboBox.currentText(),self.updateSize,\
+                                                        self.updateBin.burnAddrComboBox.currentText(),self)
                 self.connect(self.firmwareAny,SIGNAL("firmwareAnyDown"),self.firmwareAnyDown)
                 self.connect(self.firmwareAny,SIGNAL("firmwareAnyErase"),self.firmwareAnyErase)
                 self.connect(self.firmwareAny,SIGNAL("firmwareAnyUpdate"),self.firmwareAnyUpdate)
@@ -2147,9 +2207,9 @@ class MainWidget(QMainWindow):
                 else:
                     self.updateFirmwareBar=updateNewFirmwareBar("Burn Firmware",False,False)
                 self.updateFirmwareBar.show()
-                
                 self.firmwareAny=threadUserFirmware(self.updateBin.boardComboBox.currentText(),userFirmwareName,self.updateFirmwareCom,\
-                                                        self.updateBin.eraseComboBox.currentText(),userFirmwareSize,self)
+                                                        self.updateBin.eraseComboBox.currentText(),userFirmwareSize,\
+                                                        self.updateBin.burnAddrComboBox.currentText(),self)
                 self.connect(self.firmwareAny,SIGNAL("firmwareAnyDown"),self.firmwareAnyDown)
                 self.connect(self.firmwareAny,SIGNAL("firmwareAnyErase"),self.firmwareAnyErase)
                 self.connect(self.firmwareAny,SIGNAL("firmwareAnyUpdate"),self.firmwareAnyUpdate)
@@ -2369,8 +2429,12 @@ class MainWidget(QMainWindow):
         if self.isDownloadFileAndRun:
             self.isDownloadFileAndRun=False
             #if str(self.fileName).find(":")>=0:
-            if str(self.fileName).find(rootDirectoryPath)>=0:
+            if sys.platform=="linux" and str(self.fileName).find(rootDirectoryPath)>=0:
                 goProgramFile = str(self.fileName).split("/")[-1]
+            elif sys.platform=="win32" and str(self.fileName).find(":")>=0:
+                goProgramFile = str(self.fileName).split("/")[-1]
+            #if str(self.fileName).find(rootDirectoryPath)>=0:
+            #    goProgramFile = str(self.fileName).split("/")[-1]
             else:
                 goProgramFile=self.fileName
             

@@ -17,7 +17,7 @@ from PyQt4.QtGui import *
 
 
 class threadUserFirmware(QThread):
-    def __init__(self, board, savepath, com, iserase, size, parent):
+    def __init__(self, board, savepath, com, iserase, size, addr, parent):
         super(threadUserFirmware,self).__init__(parent)
 
         self.board=board
@@ -28,6 +28,13 @@ class threadUserFirmware(QThread):
         self.erasePer=0
         self.erasestart=False
         self.erasetimer=None
+        self.burnaddr=0
+        if addr=="0x0":
+            self.burnaddr=0
+        else:
+            self.burnaddr=0x1000
+
+        print("burnaddr=====%d"%self.burnaddr)
 
     def run(self):
         esptool=Esp.ESPTool()
@@ -55,21 +62,8 @@ class threadUserFirmware(QThread):
         if self.iserase=="yes":
             self.emit(SIGNAL("firmwareAnyErase"),100)
         try:
-            writeFlashAddr=0
             if self.board=="esp32" or self.board=="esp8266":
-                if self.board=="esp32":
-                    file = codecs.open(self.savepath,'rb')
-                    readline=2000
-                    while 1:
-                        msg=file.readline()
-                        if str(msg).find("v1.9.2-445-g84035f0f")>=0:
-                            writeFlashAddr = 0x1000
-                            break
-                        readline=readline-1
-                        if readline==0:
-                            break
-                    file.close()
-                Esp.Burn(esptool,str(self.board),self.savepath,self.com,False,writeFlashAddr)
+                Esp.Burn(esptool,str(self.board),self.savepath,self.com,False,self.burnaddr)
             else:#microbit
                 print("In threaddownloadfirmware:savepath=%s"%self.savepath)
                 self.emit(SIGNAL("firmwareAnyUpdate"),-2)
@@ -119,7 +113,7 @@ class threadUserFirmware(QThread):
         self.erasetimer.start()
 
 class threadDownloadFirmware(QThread):
-    def __init__(self, url, board, savepath, com, iserase, size, parent):
+    def __init__(self, url, board, savepath, com, iserase, size, addr, parent):
         super(threadDownloadFirmware,self).__init__(parent)
         self.url=url
         self.board=board
@@ -133,11 +127,17 @@ class threadDownloadFirmware(QThread):
         self.erasestart=False
 
         self.erasetimer=None
+        
+        self.burnaddr=0
+        if addr=="0x0":
+            self.burnaddr=0
+        else:
+            self.burnaddr=0x1000
 
+        print("burnaddr2=====%d"%self.burnaddr)
 
 
     def run(self):
-
         self.reDownload()                
         if self.downloadOk==True:
 
@@ -166,21 +166,8 @@ class threadDownloadFirmware(QThread):
             if self.iserase=="yes":
                 self.emit(SIGNAL("firmwareAnyErase"),100)
             try:
-                writeFlashAddr=0
                 if self.board=="esp32" or self.board=="esp8266":
-                    if self.board=="esp32":
-                        file = codecs.open(self.savepath,'rb')
-                        readline=2000
-                        while 1:
-                            msg=file.readline()
-                            if str(msg).find("v1.9.2-445-g84035f0f")>=0:
-                                writeFlashAddr=0x1000
-                                break
-                            readline=readline-1
-                            if readline==0:
-                                break
-                        file.close()
-                    Esp.Burn(esptool,str(self.board),self.savepath,self.com,False,writeFlashAddr)
+                    Esp.Burn(esptool,str(self.board),self.savepath,self.com,False,self.burnaddr)
                 else:#microbit
                     print("In threaddownloadfirmware:savepath=%s"%self.savepath)
                     self.emit(SIGNAL("firmwareAnyUpdate"),-2)
