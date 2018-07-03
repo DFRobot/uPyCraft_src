@@ -2,18 +2,26 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+import sys
 import time
 import serial
 import serial.tools.list_ports
 
-QTextCodec.setCodecForTr(QTextCodec.codecForName("utf8"))
+if sys.platform=="darwin":
+    pass
+else:
+	QTextCodec.setCodecForTr(QTextCodec.codecForName("utf8"))
 
 class findReplaceText(QDialog):
     def __init__(self,parent=None):
-        super(findReplaceText,self).__init__(parent)
-        self.setWindowTitle("Find")
+        super(findReplaceText,self).__init__(parent) 
+        self.setWindowFlags(Qt.WindowCloseButtonHint)#HelpButtonHint?
+        self.setWindowTitle("Find&Replace")
         self.setWindowIcon(QIcon(':/logo.png')) 
-        self.setStyleSheet("background-color: rgb(236, 236, 236);color:black;")
+        self.setStyleSheet("""QDialog{background-color: rgb(236, 236, 236);color:black;}
+                           QPushButton{background-color:rgb(253,97,72);color:white;}
+                           QPushButton:hover{background-color:rgb(212,212,212);color:black;}
+                           """)
         self.findedit=QLineEdit()
         self.findButton=QPushButton(self.tr("find"))
         self.replaceStartEdit=QLineEdit()
@@ -31,12 +39,17 @@ class findReplaceText(QDialog):
 
         self.setLayout(self.layout)
 
-
 class saveUntitled(QDialog):
     def __init__(self,parent=None):
         super(saveUntitled,self).__init__(parent)
+        self.setWindowFlags(Qt.WindowCloseButtonHint)#HelpButtonHint?
         self.setWindowTitle("save at your workSpace")
         self.resize(400,80)
+        self.setWindowIcon(QIcon(':/logo.png')) 
+
+        self.setStyleSheet("""QDialog{background-color: rgb(236, 236, 236);color:black;}
+                           QPushButton{background-color:rgb(253,97,72);color:white;}
+                           """)
                                 
         self.saveFileLabel=QLabel(self.tr("Input file name"))
         self.saveFileTextedit=QLineEdit()
@@ -67,8 +80,12 @@ class saveUntitled(QDialog):
 class treeRightClickRename(QDialog):
     def __init__(self,parent=None):
         super(treeRightClickRename,self).__init__(parent)
+        self.setWindowFlags(Qt.WindowCloseButtonHint)#HelpButtonHint?
         self.setWindowTitle("Rename as")
         self.setWindowIcon(QIcon(':/logo.png'))
+        self.setStyleSheet("""QDialog{background-color: rgb(236, 236, 236);color:black;}
+                           QPushButton{background-color:rgb(253,97,72);color:white;}
+                           """)
 
         self.nameLabel=QLabel(self.tr("new name:"))
         self.nameLineEdit=QLineEdit()
@@ -96,8 +113,12 @@ class treeRightClickRename(QDialog):
 class createBoardNewDirName(QDialog):
     def __init__(self,parent=None):
         super(createBoardNewDirName,self).__init__(parent)
+        self.setWindowFlags(Qt.WindowCloseButtonHint)#HelpButtonHint?
         self.setWindowTitle("boardDirName")
         self.setWindowIcon(QIcon(':/logo.png'))
+        self.setStyleSheet("""QDialog{background-color: rgb(236, 236, 236);color:black;}
+                           QPushButton{background-color:rgb(253,97,72);color:white;}
+                           """)
         self.resize(200,80)
         self.nameLabel=QLabel(self.tr("Input Dir Name"))
         self.nameLineEdit=QLineEdit()
@@ -229,7 +250,10 @@ class updateConfig(QWidget):
   
 class Preferences(QDialog):
     def __init__(self,parent=None):
-        super(Preferences,self).__init__(parent)  
+        super(Preferences,self).__init__(parent)
+        self.setWindowFlags(Qt.WindowCloseButtonHint)#HelpButtonHint?
+        self.setStyleSheet("""QDialog{background-color: rgb(236, 236, 236);color:black;}
+                           """)
         self.widget=QWidget()
         layout=QGridLayout(self.widget)
 
@@ -237,10 +261,11 @@ class Preferences(QDialog):
         self.configUpdate=updateConfig()
         
         tabWidget=QTabWidget()
-        tabWidget.setTabPosition(QTabWidget.West);
-        tabWidget.addTab(SerialWidget(self),"Serial")
-        tabWidget.addTab(self.landlocation,"Languare Location")
+        tabWidget.setTabPosition(QTabWidget.North);
         tabWidget.addTab(self.configUpdate,"config")
+        tabWidget.addTab(self.landlocation,"Languare Location")
+        tabWidget.addTab(SerialWidget(self),"Serial")
+        
         layout.addWidget(tabWidget,1,0)
         self.setLayout(layout)
         self.resize(300,200)

@@ -16,7 +16,23 @@ class myTerminal(QTextEdit):
     def __init__(self,queue,parent):        
         super(myTerminal,self).__init__(parent)
         self.eventFilterEnable=False
-        self.setStyleSheet("background-color: rgb(236, 236, 236);border-style:none;")
+        self.setStyleSheet("""QTextEdit{background-color: qlineargradient(x1: 0, x2: 1, stop: 0 #262D34, stop: 1 #222529);
+                           border-style:none;
+                           color:white;}
+                           QScrollBar:vertical{background-color:rgb(94,98,102);
+                               border:0px;
+                               width: 15px;
+                               margin:0px 0px 0px 0px;
+                           }
+                           QScrollBar::add-page:vertical{background-color:rgb(61,62,64);
+                               width: 15px;
+                               margin:0px 0px 0px 0px;
+                           }
+                           QScrollBar::sub-page:vertical{background-color:rgb(61,62,64);
+                               width: 15px;
+                               margin:0px 0px 0px 0px;
+                           }
+                           """)
         #self.setReadOnly(False)
         self.installEventFilter(self)
         self.setTextInteractionFlags(Qt.TextSelectableByMouse)
@@ -52,8 +68,10 @@ class myTerminal(QTextEdit):
         self.connect(self,SIGNAL("customContextMenuRequested(const QPoint&)"),self.slotTerminalRightClickMenu)
         self.terminalRightMenu=QMenu(self)
         self.terminalRightMenu.setStyleSheet(
-                "QMenu::item{padding:4px 16px;}"
-                "QMenu::item::selected{background-color:rgb(135,206,255);}"
+                """QMenu{background-color:rgb(67,67,67);
+                        color:white;}
+                QMenu::item{padding:4px 16px;}
+                QMenu::item::selected{background-color:rgb(124,124,124);}"""
             )
 
         terminalCopy=QAction(QIcon(":/copy.png"),self.tr("copy"),self)
@@ -181,25 +199,27 @@ class myTerminal(QTextEdit):
                 self.messycode=b''
         
         if self.keyPressMsg=="\x08" and self.ui.cursor.atEnd()==True:#Backspace
+            mycursor=self.textCursor()
             self.recvdata+=data
             if self.currentBoard=="microbit":
                 if self.recvdata=="\x08\x20\x08":
-                    self.ui.cursor.deletePreviousChar()
+                    mycursor.deletePreviousChar()
                     self.recvdata=""
                 elif self.recvdata=="\x08\x08\x08\x08\x20\x20\x20\x20\x08\x08\x08\x08":
                     for i in range(0,4):
-                        self.ui.cursor.deletePreviousChar()
+                        mycursor.deletePreviousChar()
                     self.recvdata=""
             else:
                 if self.recvdata.find("\x08\x1b\x5b\x4b")==0:
-                    self.ui.cursor.deletePreviousChar()
+                    mycursor.deletePreviousChar()
                     self.recvdata=""
                 elif self.recvdata.find("\x08\x1b\x5b\x4b")>0:
                     for i in range(self.recvdata.find("\x08\x1b\x5b\x4b")+1):
                         if self.recvdata[i]=="\x08":
-                            self.ui.cursor.deletePreviousChar()
+                            mycursor.deletePreviousChar()
                     self.recvdata=""
         elif self.keyPressMsg=="\x08" and not self.ui.cursor.atEnd():#Backspace
+            mycursor=self.textCursor()
             self.recvdata+=data
             if self.currentBoard=="microbit":
                 if len(self.recvdata)>5:
@@ -207,7 +227,7 @@ class myTerminal(QTextEdit):
                         pass
                     elif self.recvdata[-1]=="\x08" and self.recvdata[-2]!="\x20":
                         for i in range(self.recvdata.find("\x20")):
-                            self.ui.cursor.deletePreviousChar()
+                            mycursor.deletePreviousChar()
                         self.recvdata=""
                         self.keyPressMsg="else"
                     else:
@@ -218,14 +238,16 @@ class myTerminal(QTextEdit):
                 if self.recvdata.find("\x1b\x5b")>0 and self.recvdata[-1]=="\x08":
                     for i in range(self.recvdata.find("\x1b\x5b")):
                         if self.recvdata[i]=="\x08":
-                            self.ui.cursor.deletePreviousChar()
+                            mycursor.deletePreviousChar()
                     self.recvdata="" 
                     self.keyPressMsg="else"
                 elif self.recvdata.count("\x1b\x5b")==2 and self.recvdata[-1]=="\x44":
                     for i in range(self.recvdata.find("\x1b\x5b")):
                         if self.recvdata[i]=="\x08":
-                            self.ui.cursor.deletePreviousChar()
+                            mycursor.deletePreviousChar()
                     self.recvdata=""
+                #else:
+                #    print("9999")
         elif self.keyPressMsg=="\x09" and not self.ui.cursor.atEnd():#debug
             self.recvdata+=data
             if self.recvdata=="\x08":
@@ -456,7 +478,26 @@ class myTreeView(QTreeView):
         self.ui=parent
         
         self.setHeaderHidden(True)
-        self.setStyleSheet("background-color: rgb(220, 220, 220);border-width:1px;border-color:#888888;border-style:solid;")
+        self.setStyleSheet("""
+            QTreeView{
+                background-color: qlineargradient(y1: 0, y2: 1,stop: 0 #0D0B0B, stop: 1 #5D5C5C);
+                border-width:1px;
+                border-color:#888888;
+                border-style:solid;
+                color:white;
+            }
+
+            QTreeView::branch:closed:has-children {
+                border-image: none;
+                image: url(':/treeBranchOpen.png');
+            }
+
+            QTreeView::branch:open:has-children {
+                border-image: none;
+                image: url(':/treeBranchClose.png');
+            }""")
+
+        
         self.setEditTriggers(QAbstractItemView.NoEditTriggers)
         
         self.setAcceptDrops(True)
@@ -505,8 +546,10 @@ class myTreeView(QTreeView):
 
         self.rightClickMenu=QMenu(self)
         self.rightClickMenu.setStyleSheet(
-                "QMenu::item{padding:4px 16px;}"
-                "QMenu::item::selected{background-color:rgb(135,206,255);}"
+                """QMenu{background-color:rgb(67,67,67);
+                        color:white;}
+                QMenu::item{padding:4px 16px;}
+                QMenu::item::selected{background-color:rgb(127,127,127);}"""
             )
         self.rightClickMenu.addAction(self.runFile)
         self.rightClickMenu.addAction(self.openFile)
@@ -525,17 +568,17 @@ class myTreeView(QTreeView):
         elif (self.ui.fileName=="." or self.ui.fileName=="/flash") and not self.ui.myserial.ser.isOpen():
             pass
         elif self.ui.fileName=="/sd" or \
-             (((sys.platform=="linux" and self.ui.fileName.find(rootDirectoryPath)>=0) or (sys.platform=="win32" and self.ui.fileName.find(":")>=0)) and self.ui.fileName.split("/")[-1]=="uPy_lib"):
+             (((sys.platform=="linux" and self.ui.fileName.find(rootDirectoryPath)>=0) or (sys.platform=="win32" and self.ui.fileName.find(":")>=0) or (sys.platform=="darwin" and self.ui.fileName.find(rootDirectoryPath)>=0)) and self.ui.fileName.split("/")[-1]=="uPy_lib"):
             pass
         #elif self.ui.fileName.find(":")>=0 and self.ui.fileName.find("uPy_lib")>0:
-        elif ((sys.platform=="linux" and self.ui.fileName.find(rootDirectoryPath)>=0) or (sys.platform=="win32" and self.ui.fileName.find(":")>=0)) and self.ui.fileName.find("uPy_lib")>0:
+        elif ((sys.platform=="linux" and self.ui.fileName.find(rootDirectoryPath)>=0) or (sys.platform=="win32" and self.ui.fileName.find(":")>=0) or (sys.platform=="darwin" and self.ui.fileName.find(rootDirectoryPath)>=0)) and self.ui.fileName.find("uPy_lib")>0:
             self.rightClickMenu.addAction(self.openFile)
             self.rightClickMenu.addAction(self.closeFile)
         #elif self.ui.fileName.find(":")>=0 and self.ui.fileName.split("/")[-1]=="workSpace":
-        elif ((sys.platform=="linux" and self.ui.fileName.find(rootDirectoryPath)>=0) or (sys.platform=="win32" and self.ui.fileName.find(":")>=0)) and self.ui.fileName.split("/")[-1]=="workSpace":
+        elif ((sys.platform=="linux" and self.ui.fileName.find(rootDirectoryPath)>=0) or (sys.platform=="win32" and self.ui.fileName.find(":")>=0) or (sys.platform=="darwin" and self.ui.fileName.find(rootDirectoryPath)>=0)) and self.ui.fileName.split("/")[-1]=="workSpace":
             self.rightClickMenu.addAction(self.openFile)
         #elif self.ui.fileName.find(":")>=0 and self.ui.fileName.find("workSpace")>0:
-        elif ((sys.platform=="linux" and self.ui.fileName.find(rootDirectoryPath)>=0) or (sys.platform=="win32" and self.ui.fileName.find(":")>=0)) and self.ui.fileName.find("workSpace")>0:
+        elif ((sys.platform=="linux" and self.ui.fileName.find(rootDirectoryPath)>=0) or (sys.platform=="win32" and self.ui.fileName.find(":")>=0) or (sys.platform=="darwin" and self.ui.fileName.find(rootDirectoryPath)>=0)) and self.ui.fileName.find("workSpace")>0:
             self.rightClickMenu.addAction(self.openFile)
             self.rightClickMenu.addAction(self.closeFile)
             self.rightClickMenu.addAction(self.deleteFile)
@@ -775,7 +818,7 @@ class myTabWidget(QTabWidget):
 
         self.connect(self, SIGNAL("tabCloseRequested(int)"),self.closeTab)
         self.connect(self, SIGNAL("currentChanged(int)"),self.currentTabChange)
-        
+
     def closeTab(self,tabId):
         if tabId<0:
             return
@@ -823,7 +866,6 @@ class myTabWidget(QTabWidget):
     def currentTabChange(self,tabId):
         self.currentTab=tabId
         print(self.currentTab)
-
     def createNewTab(self,filename,msg,lexer):
         if type(msg) is bytes:
             msg=msg.decode(encoding='utf-8')
@@ -840,10 +882,20 @@ class myTabWidget(QTabWidget):
         editor=myQsciScintilla()
         editor.setUtf8(True)
         editor.setLexer(lexer)
-        editor.setMarginsBackgroundColor(QColor(220,220,220))
+        editor.setMarginsBackgroundColor(QColor(39,43,48))#行号背景色
+        editor.setMarginsForegroundColor(QColor(255,255,255))#行号前景色
         editor.setAutoCompletionThreshold(2)
         editor.setAutoCompletionSource(QsciScintilla.AcsAll)
         editor.setEolMode(QsciScintilla.EolUnix)
+        
+        #显示缩进参考线
+        editor.SendScintilla(QsciScintilla.SCI_SETINDENTATIONGUIDES,QsciScintilla.SC_IV_LOOKFORWARD)
+        #设置匹配项的背景色
+        editor.setMatchedBraceBackgroundColor(QColor(255,184,255))
+
+
+        
+        
 
         if str(filename).find("/")>=0:
             tabname=filename.split("/")
@@ -863,7 +915,7 @@ class myTabWidget(QTabWidget):
                 msg="from microbit import *\r#write your program:\r"
         #elif str(filename).find(":")>0:
         #elif str(filename).find(rootDirectoryPath)>=0:
-        elif (sys.platform=="linux" and str(filename).find(rootDirectoryPath)>=0) or (sys.platform=="win32" and str(filename).find(":")>0):
+        elif (sys.platform=="linux" and str(filename).find(rootDirectoryPath)>=0) or (sys.platform=="win32" and str(filename).find(":")>0) or (sys.platform=="darwin" and str(filename).find(rootDirectoryPath)>=0):
         #elif sys.platform=="win32" or sys.platform=="linux":
             self.tabBar().setTabTextColor(self.count()-1, QColor(Qt.red))
             self.setTabIcon(self.count()-1, QIcon(':/pc.png'))
@@ -878,10 +930,12 @@ class myTabWidget(QTabWidget):
 
         if self.editorRightMenu==None:
             self.editorRightMenu=QMenu(self)
-            self.editorRightMenu.setStyleSheet(
-                "QMenu::item{padding:4px 16px;}"
-                "QMenu::item::selected{background-color:rgb(135,206,255);}"
-            )
+            self.editorRightMenu.setStyleSheet("""
+                QMenu{background-color:rgb(67,67,67);
+                        color:white;}
+                QMenu::item{padding:4px 16px;}
+                QMenu::item::selected{background-color:rgb(124,124,124);}
+            """)
             
             undo=QAction(self.tr("Undo"),self)
             undo.setShortcut("Ctrl+Z")
@@ -919,7 +973,7 @@ class myTabWidget(QTabWidget):
         #The line number display area
         editor.setMarginType(0, QsciScintilla.NumberMargin)
         editor.setMarginLineNumbers(0, True)
-        editor.setMarginWidth(0,30)
+        editor.setMarginWidth(0,35)
 
         #set auto indentation
         editor.setAutoIndent(True)
@@ -931,12 +985,21 @@ class myTabWidget(QTabWidget):
         editor.setMarginSensitivity(1,False)
         editor.setMarginMarkerMask(1,0x1FFFFFF)
         editor.markerDefine(QsciScintilla.Background,1)
+
+        #set cursor color
+        editor.setCaretForegroundColor(QColor(255,255,255))
     
         #Automatic folding area
-        editor.setFolding(QsciScintilla.CircledFoldStyle)
+        editor.setFolding(QsciScintilla.PlainFoldStyle)
+        editor.setFoldMarginColors(QColor(39,43,48),QColor(39,43,48))
+
+        editor.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        editor.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
         #set tab's stylesheet
-        editor.setStyleSheet("QWidget{font-size:20px;border: 1px solid white;border-radius:1px}")
+        editor.setStyleSheet("""QWidget{font-size:20px;border: 0px solid white;border-radius:1px;}""")
+
+
 
         self.setCurrentWidget(editor)
         if filename!="untitled":

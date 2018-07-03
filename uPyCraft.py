@@ -39,10 +39,10 @@ from check                      import checkVersionExampleFire, attentionUpdata,
 from threadDownloadFirmware     import threadDownloadFirmware, threadUserFirmware
 from microbit_api               import MICROPYTHON_APIS
 
-from MONACO import monaco
+from SYUAN import syuan
 
 mainShow=True
-nowIDEVersion      ="0.30"
+nowIDEVersion      ="0.31"
 isCheckFirmware    =False
 rootDirectoryPath  =os.path.expanduser("~")
 rootDirectoryPath  =rootDirectoryPath.replace("\\","/")
@@ -79,6 +79,7 @@ class fileItem:
 class MainWidget(QMainWindow):
     def __init__(self,parent=None):
         super(MainWidget,self).__init__(parent)
+        #self.setWindowFlags(Qt.WindowCloseButtonHint)#HelpButtonHint?
 #basic set
         self.setWindowTitle("uPyCraft V%s"%nowIDEVersion)
         self.setWindowIcon(QIcon(':/logo.png'))
@@ -97,6 +98,8 @@ class MainWidget(QMainWindow):
         self.currentBoard="esp32"
         self.workspacePath=""
         self.canNotIdentifyBoard=False
+
+        #self.setStyleSheet("background-color: rgb(254, 138, 58);")
 
         self.clipboard=QApplication.clipboard()
 
@@ -181,42 +184,54 @@ class MainWidget(QMainWindow):
         
         self.check.start()
 
+        self.setStyleSheet("""
+        QMessageBox { background-color: rgb(236,236,236);color:black; }
+        QPushButton{background-color:rgb(253,97,72);color:white;}
+        """)
+
     def setFont(self):
         fonts=None
-        if sys.platform.startswith('win32') or sys.platform.startswith('cygwin'):
+        if sys.platform.startswith('win32') or sys.platform.startswith('cygwin'):#for windows
             FONTDIRS=os.path.join(os.environ['WINDIR'],'Fonts')
+            fonts=os.listdir(FONTDIRS)
+            flags=False
+        elif sys.platform.startswith('darwin'):#for mac
+            FONTDIRS=os.path.join(os.environ['PWD'])
             fonts=os.listdir(FONTDIRS)
             flags=False
         if fonts==None:
             return
         for filename in fonts:
-            if(filename.upper().find('MONACO.TTF')==0):
+            if(filename.upper().find('SYUAN.TTF')==0):
                 flags=True
                 break
         if flags is False:
-            checkfont=QMessageBox.question(self,"MONACO Font",  
-                                    "Please install MONACO font",
+            checkfont=QMessageBox.question(self,"SYUAN Font",  
+                                    "Please install SYUAN font",
                                     QMessageBox.Ok|QMessageBox.Cancel,  
                                     QMessageBox.Ok)  
             if checkfont==QMessageBox.Ok:
-                ttf=binascii.unhexlify(monaco)
-                fp=open('./MONACO.TTF','wb')
+                ttf=binascii.unhexlify(syuan)
+                fp=open('./SYUAN.TTF','wb')
                 fp.write(ttf)
                 fp.close()
-                os.system('MONACO.TTF')
-                os.remove("MONACO.TTF")
+                if sys.platform.startswith('win32') or sys.platform.startswith('cygwin'):
+                    os.system('SYUAN.TTF')
+                elif sys.platform.startswith('darwin'):
+                    subprocess.call(['open','SYUAN.TTF'])
+                #os.remove("SYUAN.TTF")
 						  
-        font=QFont(self.tr("monaco"),10)
+        font=QFont(self.tr("syuan"),10)
         QApplication.setFont(font)
 
     def createTree(self):
         self.tree=myTreeView(self)
         self.connect(self.tree,SIGNAL("doubleClicked(QModelIndex)"),self.slotTreeDoubleClickOpenFile)
         
-        self.rootDevice=QStandardItem(QIcon(":/fileopen.png"),"device")
-        self.rootSD=QStandardItem(QIcon(":/fileopen.png"),"sd")
-        self.rootLib=QStandardItem(QIcon(":/fileopen.png"),"uPy_lib")
-        self.workSpace=QStandardItem(QIcon(":/fileopen.png"),"workSpace")
+        self.rootDevice=QStandardItem(QIcon(":/treeMenuClosed.png"),"device")
+        self.rootSD=QStandardItem(QIcon(":/treeMenuClosed.png"),"sd")
+        self.rootLib=QStandardItem(QIcon(":/treeMenuClosed.png"),"uPy_lib")
+        self.workSpace=QStandardItem(QIcon(":/treeMenuClosed.png"),"workSpace")
 
         model=QStandardItemModel(self.tree)
         #stringlist = [' board']
@@ -230,23 +245,35 @@ class MainWidget(QMainWindow):
         self.tree.setModel(model)
         self.tree.createRightMenu()
 
+        
+
     def createLexer(self):
         self.lexer = QsciLexerPython()
-        self.lexer.setDefaultPaper(QColor(236,236,236))
+        self.lexer.setDefaultPaper(QColor(38,45,52))
+        self.lexer.setDefaultColor(QColor(255,255,255))
 
         self.lexer.setFont(QFont(self.tr("Consolas"),13,1))
-        self.lexer.setColor( Qt.darkGreen, QsciLexerPython.Comment)
 
-        self.lexer.setColor( QColor(100,100,100), QsciLexerPython.SingleQuotedString )
-        self.lexer.setColor( QColor(100,100,100), QsciLexerPython.DoubleQuotedString )
+        self.lexer.setColor( Qt.darkGreen, QsciLexerPython.Comment)
         self.lexer.setColor( QColor(255,128,0), QsciLexerPython.TripleDoubleQuotedString )
 
         self.lexer.setColor( QColor(165,42,42), QsciLexerPython.ClassName )
         self.lexer.setColor( QColor(0,138,140), QsciLexerPython.FunctionMethodName )
                 
-        self.lexer.setColor( Qt.blue, QsciLexerPython.Keyword )
+        self.lexer.setColor( Qt.green, QsciLexerPython.Keyword )
         self.lexer.setColor( QColor(255,0,255), QsciLexerPython.Number )
         self.lexer.setColor( Qt.darkBlue, QsciLexerPython.Decorator )
+        self.lexer.setColor( QColor(165,152,36), QsciLexerPython.DoubleQuotedString )
+        self.lexer.setColor( QColor(165,152,36), QsciLexerPython.SingleQuotedString )
+
+
+        
+
+        
+
+
+
+        #self.lexer.setIndentationWarning(QsciLexerPython.Spaces)
 
     def createTerminal(self):
         self.terminal=myTerminal(self.readwriteQueue,self)
@@ -261,8 +288,24 @@ class MainWidget(QMainWindow):
     def createTabWidget(self):
         self.tabWidget=myTabWidget(self.editorRightMenu,self.fileitem,self)
         self.tabWidget.setTabsClosable(True)
-        self.tabWidget.setStyleSheet("background-color: rgb(236, 236, 236);border-width:0px;border-color:#666666;border-style:solid;")
-        self.tabWidget.setFont(QFont(self.tr("monaco"),10,100))
+        self.tabWidget.setFont(QFont(self.tr("syuan"),10,100))
+        self.tabWidget.setStyleSheet(""" QWidget{background-color: qlineargradient(x1: 0, x2: 1,stop: 0 #262D34, stop: 1 #222529);
+                                     border-width:0px;border-color:#666666;border-style:none;color:white;}
+                                     QScrollBar:vertical{background-color:rgb(94,98,102);
+                                         border:0px;
+                                         width: 15px;
+                                         margin:0px 0px 0px 0px;
+                                     }
+                                     QScrollBar::add-page:vertical{background-color:rgb(61,62,64);
+                                         width: 15px;
+                                         margin:0px 0px 0px 0px;
+                                     }
+                                     QScrollBar::sub-page:vertical{background-color:rgb(61,62,64);
+                                         width: 15px;
+                                         margin:0px 0px 0px 0px;
+                                     }
+                                     """)
+        
 
         #self.connect(self.tabWidget, SIGNAL("tabCloseRequested(int)"),self.closeTab)
         #self.connect(self.tabWidget, SIGNAL("currentChanged(int)"),self.currentTabChange)
@@ -270,7 +313,21 @@ class MainWidget(QMainWindow):
     def createRightSplitter(self):
         self.rightSplitter=QSplitter(Qt.Vertical)
         self.rightSplitter.setOpaqueResize(False)
-        self.rightSplitter.setStyleSheet("background-color: rgb(236, 236, 236);border-style:none;")
+        self.rightSplitter.setStyleSheet("QSplitter{background-color:qlineargradient(x1: 0, x2: 1,stop: 0 #646464, stop: 1 #171717);}"
+            "QTabBar::tab{ border-top-left-radius:3px; border-top-right-radius:5px; \
+                                    min-width:120px;  \
+                                    min-height:25px;  \
+                                    border:0px solid rgb(255,0,0); \
+                                    border-bottom:none;  \
+                                    margin-top: 3; \
+                                    color: rgb(255,255,255);\
+                                    }"
+        "QTabWidget::pane{border-width:0px;border-color:rgb(161,161,161);    border-style: inset;background-color: rgb(64, 64, 64);}"
+        "QTabBar::tab::selected{background-color:rgb(38,45,52);border-bottom:2px solid rgb(254,152,77);}" 
+        "QTabBar::tab::!selected{background-color:rgb(64,64,64);}"
+        "QTabBar::close-button{subcontrol-position:right;image: url(:/tabClose.png)  }"
+        "QTabBar::close-button:hover{subcontrol-position:right;image: url(:/tabCloseHover.png)  }"
+                                    )
         self.rightSplitter.setHandleWidth(1)
 
         self.rightSplitter.addWidget(self.tabWidget)
@@ -293,32 +350,57 @@ class MainWidget(QMainWindow):
 
     def createActions(self):
 #File
-        self.fileOpenAction=QAction(QIcon(":/fileopen.png"),self.tr("Open"),self)  
+        #self.fileOpenAction=QAction(QIcon(":/fileOpen.png"),self.tr("Open"),self)
+        self.fileOpenAction=QAction(self.tr("Open"),self) 
         self.fileOpenAction.setShortcut("Ctrl+O")  
         self.fileOpenAction.setStatusTip(self.tr("open a new file"))  
         self.connect(self.fileOpenAction,SIGNAL("triggered()"),self.slotOpenFile)
 
-        self.fileNewAction=QAction(QIcon(":/newfile.png"),self.tr("New"),self)  
+        self.fileOpenToolsAction=QAction(QIcon(":/fileOpen.png"),self.tr("Open"),self) 
+        self.fileOpenToolsAction.setShortcut("Ctrl+O")  
+        self.fileOpenToolsAction.setStatusTip(self.tr("open a new file"))  
+        self.connect(self.fileOpenToolsAction,SIGNAL("triggered()"),self.slotOpenFile)
+
+        #self.fileNewAction=QAction(QIcon(":/newFile.png"),self.tr("New"),self)
+        self.fileNewAction=QAction(self.tr("New"),self)  
         self.fileNewAction.setShortcut("Ctrl+N")  
         self.fileNewAction.setStatusTip(self.tr("create a new file"))  
         self.connect(self.fileNewAction,SIGNAL("triggered()"),self.slotNewFile)
 
-        self.fileSaveAction=QAction(QIcon(":/save.png"),self.tr("Save"),self)  
+        self.fileNewToolsAction=QAction(QIcon(":/newFile.png"),self.tr("New"),self)
+        self.fileNewToolsAction.setShortcut("Ctrl+N")  
+        self.fileNewToolsAction.setStatusTip(self.tr("create a new file"))  
+        self.connect(self.fileNewToolsAction,SIGNAL("triggered()"),self.slotNewFile)
+        #self.connect(self.fileNewToolsAction,SIGNAL("hovered()"),self.slotNewFileHover)
+
+        #self.fileSaveAction=QAction(QIcon(":/save.png"),self.tr("Save"),self)
+        self.fileSaveAction=QAction(self.tr("Save"),self)  
         self.fileSaveAction.setShortcut("Ctrl+S")  
         self.fileSaveAction.setStatusTip(self.tr("save the file"))  
         self.connect(self.fileSaveAction,SIGNAL("triggered()"),self.slotSaveFile)
 
-        self.fileSaveAsAction=QAction(QIcon(":/saveas.png"),self.tr("Save as"),self)  
+        self.fileSaveToolsAction=QAction(QIcon(":/save.png"),self.tr("Save"),self)  
+        self.fileSaveToolsAction.setShortcut("Ctrl+S")  
+        self.fileSaveToolsAction.setStatusTip(self.tr("save the file"))  
+        self.connect(self.fileSaveToolsAction,SIGNAL("triggered()"),self.slotSaveFile)
+
+        #self.fileSaveAsAction=QAction(QIcon(":/saveas.png"),self.tr("Save as"),self)
+        self.fileSaveAsAction=QAction(self.tr("Save as"),self)  
         self.fileSaveAsAction.setStatusTip(self.tr("save as a file"))  
         self.connect(self.fileSaveAsAction,SIGNAL("triggered()"),self.slotSaveFileAs)
 
-        self.refreshBoardFileAction=QAction(QIcon(":/flush.png"),self.tr("Reflush Directory "),self)  
+        #self.refreshBoardFileAction=QAction(QIcon(":/flush.png"),self.tr("Reflush Directory "),self)
+        self.refreshBoardFileAction=QAction(self.tr("Reflush Directory "),self)  
         self.refreshBoardFileAction.setStatusTip(self.tr("refresh board file"))  
         self.connect(self.refreshBoardFileAction,SIGNAL("triggered()"),self.slotTreeModel)
 
-        self.exampleTools=QAction(QIcon(":/examples.png"),self.tr("Examples"),self)
+        #self.exampleTools=QAction(QIcon(":/examples.png"),self.tr("Examples"),self)
+        self.exampleTools=QAction(self.tr("Examples"),self)
         self.exampleMenu=QMenu(self.tr("example"))
         self.connect(self.exampleMenu,SIGNAL("triggered(QAction*)"),self.showExamples)
+
+        self.exampleMenu.setStyleSheet("""QMenu {background-color: rgb(254,254,254);}
+                                   QMenu::item::selected { background-color: rgb(255,239,227); color: #000;}""")
 
         if self.currentBoard=="esp32":
             self.boardEsp32()
@@ -334,48 +416,74 @@ class MainWidget(QMainWindow):
         self.createUpyLibMenu()
         self.createWorkSpaceMenu()
 
-        self.exitAction=QAction(QIcon(":/exit.png"),self.tr("Exit"),self)
+        #self.exitAction=QAction(QIcon(":/exit.png"),self.tr("Exit"),self)
+        self.exitAction=QAction(self.tr("Exit"),self)
         self.exitAction.setShortcut("Ctrl+Q")
         self.setStatusTip(self.tr("Out"))
         self.connect(self.exitAction,SIGNAL("triggered()"),self.close)
 #Edit
-        self.cutAction=QAction(QIcon(":/cut.png"),self.tr("Cut"),self)  
+        #self.cutAction=QAction(QIcon(":/cut.png"),self.tr("Cut"),self)
+        self.cutAction=QAction(self.tr("Cut"),self)  
         self.cutAction.setShortcut("Ctrl+X")  
         self.connect(self.cutAction,SIGNAL("triggered()"),self.slotCut)
 
-        self.copyAction=QAction(QIcon(":/copy.png"),self.tr("Copy"),self)  
+        #self.copyAction=QAction(QIcon(":/copy.png"),self.tr("Copy"),self)
+        self.copyAction=QAction(self.tr("Copy"),self) 
         self.copyAction.setShortcut("Ctrl+C")  
         self.connect(self.copyAction,SIGNAL("triggered()"),self.slotCopy)
 
-        self.pasteAction=QAction(QIcon(":/paste.png"),self.tr("Paste"),self)  
+        #self.pasteAction=QAction(QIcon(":/paste.png"),self.tr("Paste"),self)
+        self.pasteAction=QAction(self.tr("Paste"),self)
         self.pasteAction.setShortcut("Ctrl+V")  
         self.connect(self.pasteAction,SIGNAL("triggered()"),self.slotPaste)
 
-        self.undoAction=QAction(QIcon(":/undo.png"),self.tr("Undo"),self)  
+        #self.undoAction=QAction(QIcon(":/undo.png"),self.tr("Undo"),self)
+        self.undoAction=QAction(self.tr("Undo"),self)
         self.undoAction.setShortcut("Ctrl+Z")  
         self.connect(self.undoAction,SIGNAL("triggered()"),self.slotUndo)
 
-        self.redoAction=QAction(QIcon(":/redo.png"),self.tr("Redo"),self)  
+        self.undoToolsAction=QAction(QIcon(":/undo.png"),self.tr("Undo"),self)
+        self.undoToolsAction.setShortcut("Ctrl+Z")  
+        self.connect(self.undoToolsAction,SIGNAL("triggered()"),self.slotUndo)
+
+        #self.redoAction=QAction(QIcon(":/redo.png"),self.tr("Redo"),self)
+        self.redoAction=QAction(self.tr("Redo"),self)
         self.redoAction.setShortcut("Ctrl+Y")  
         self.connect(self.redoAction,SIGNAL("triggered()"),self.slotRedo)
 
-        self.syntaxCheckAction=QAction(QIcon(":/syntaxCheck.png"),self.tr("syntaxCheck"),self)
+        self.redoToolsAction=QAction(QIcon(":/redo.png"),self.tr("Redo"),self)
+        self.redoToolsAction.setShortcut("Ctrl+Y")  
+        self.connect(self.redoToolsAction,SIGNAL("triggered()"),self.slotRedo)
+
+        #self.syntaxCheckAction=QAction(QIcon(":/syntaxCheck.png"),self.tr("syntaxCheck"),self)
+        self.syntaxCheckAction=QAction(self.tr("syntaxCheck"),self)
         self.syntaxCheckAction.setStatusTip("the program syntax check")
         self.connect(self.syntaxCheckAction,SIGNAL("triggered()"),self.slotSyntaxCheck)
 
-        self.clearTerminalAction=QAction(QIcon(":/clear.png"),self.tr("Clear"),self)   
+        self.syntaxCheckToolsAction=QAction(QIcon(":/syntaxCheck.png"),self.tr("syntaxCheck"),self)
+        self.syntaxCheckToolsAction.setStatusTip("the program syntax check")
+        self.connect(self.syntaxCheckToolsAction,SIGNAL("triggered()"),self.slotSyntaxCheck)
+
+        #self.clearTerminalAction=QAction(QIcon(":/clear.png"),self.tr("Clear"),self)
+        self.clearTerminalAction=QAction(self.tr("Clear"),self)  
         self.clearTerminalAction.setStatusTip(self.tr("clear Terminal"))  
         self.connect(self.clearTerminalAction,SIGNAL("triggered()"),self.slotClearTerminal)
+
+        self.clearTerminalToolsAction=QAction(QIcon(":/clear.png"),self.tr("Clear"),self)  
+        self.clearTerminalToolsAction.setStatusTip(self.tr("clear Terminal"))  
+        self.connect(self.clearTerminalToolsAction,SIGNAL("triggered()"),self.slotClearTerminal)
         
-        self.findAction=QAction(QIcon(":/find.png"),self.tr("find"),self)
+        #self.findAction=QAction(QIcon(":/find.png"),self.tr("find replace"),self)
+        self.findAction=QAction(self.tr("find replace"),self)
         self.findAction.setShortcut("Ctrl+F")
         self.connect(self.findAction,SIGNAL("triggered()"),self.slotFindReplaceText)
 
-        self.replaceAction=QAction(QIcon(":/insted.png"),self.tr("replace"),self)
-        self.replaceAction.setShortcut("Ctrl+H")
-        self.connect(self.replaceAction,SIGNAL("triggered()"),self.slotFindReplaceText)
+        #self.replaceAction=QAction(QIcon(":/insted.png"),self.tr("replace"),self)
+        #self.replaceAction.setShortcut("Ctrl+H")
+        #self.connect(self.replaceAction,SIGNAL("triggered()"),self.slotFindReplaceText)
 #tools
-        self.comMenuTools=QAction(QIcon(":/serial.png"),self.tr("Serial"),self)
+        #self.comMenuTools=QAction(QIcon(":/serial.png"),self.tr("Serial"),self)
+        self.comMenuTools=QAction(self.tr("Serial"),self)
         self.comMenu=QMenu(self.tr("com"))
         self.comActionGroup=QActionGroup(self)
         
@@ -389,12 +497,23 @@ class MainWidget(QMainWindow):
         self.comActionGroup.setExclusive(True)
         self.connect(self.comMenu,SIGNAL("triggered(QAction*)"),self.slotChooseCom)
         self.comMenuTools.setMenu(self.comMenu)
+        
+        self.comMenu.setStyleSheet("""QMenu {background-color: rgb(254,254,254);}
+                                   QMenu::item::selected { background-color: rgb(255,239,227); color: #000;}""")
 
-        self.serialConnect=QAction(QIcon(":/connect.png"),self.tr("Connect"),self)
+        #self.serialConnect=QAction(QIcon(":/connect.png"),self.tr("Connect"),self)
+        self.serialConnect=QAction(self.tr("Connect"),self)
         self.connect(self.serialConnect,SIGNAL("triggered()"),self.slotConnectSerial)
 
-        self.serialClose=QAction(QIcon(":/close.png"),self.tr("disconnect"),self)
+        self.serialConnectToolsAction=QAction(QIcon(":/serialConnect.png"),self.tr("Connect"),self)
+        self.connect(self.serialConnectToolsAction,SIGNAL("triggered()"),self.slotConnectSerial)
+
+        #self.serialClose=QAction(QIcon(":/serialClose.png"),self.tr("disconnect"),self)
+        self.serialClose=QAction(self.tr("disconnect"),self)
         self.connect(self.serialClose,SIGNAL("triggered()"),self.slotCloseSerial)
+
+        self.serialCloseToolsAction=QAction(QIcon(":/serialClose.png"),self.tr("disconnect"),self)
+        self.connect(self.serialCloseToolsAction,SIGNAL("triggered()"),self.slotCloseSerial)
 
         self.esp8266=QAction(self.tr("esp8266"),self)
         self.connect(self.esp8266,SIGNAL("triggered()"),self.boardEsp8266)
@@ -431,33 +550,54 @@ class MainWidget(QMainWindow):
         self.boardMenu.addAction(self.pyboard)
         self.boardMenu.addAction(self.microbit)
         self.boardMenu.addAction(self.otherBoard)
-        self.boardMenuTools=QAction(QIcon(":/board.png"),self.tr("board"),self)
+        #self.boardMenuTools=QAction(QIcon(":/board.png"),self.tr("board"),self)
+        self.boardMenuTools=QAction(self.tr("board"),self)
         self.boardMenuTools.setMenu(self.boardMenu)
 
-        self.downloadAction=QAction(QIcon(":/download.png"),self.tr("Download"),self) 
+        self.boardMenu.setStyleSheet("""QMenu {background-color: rgb(254,254,254);}
+                                   QMenu::item::selected { background-color: rgb(255,239,227); color: #000;}""")
+
+
+        #self.downloadAction=QAction(QIcon(":/download.png"),self.tr("Download"),self)
+        self.downloadAction=QAction(self.tr("Download"),self)
         self.downloadAction.setStatusTip(self.tr("download file to the board"))
         self.connect(self.downloadAction,SIGNAL("triggered()"),self.slotDownloadFile)
 
-        self.downloadAndRunAction=QAction(QIcon(":/downloadandrun.png"),self.tr("DownloadAndRun"),self) 
+        #self.downloadAndRunAction=QAction(QIcon(":/downloadAndRun.png"),self.tr("DownloadAndRun"),self)
+        self.downloadAndRunAction=QAction(self.tr("DownloadAndRun"),self) 
         self.downloadAndRunAction.setShortcut("F5") 
         self.downloadAndRunAction.setStatusTip(self.tr("download file and run"))
         self.connect(self.downloadAndRunAction,SIGNAL("triggered()"),self.slotDownloadFileAndRun)
+
+        self.downloadAndRunToolsAction=QAction(QIcon(":/downloadAndRun.png"),self.tr("DownloadAndRun"),self) 
+        self.downloadAndRunToolsAction.setShortcut("F5") 
+        self.downloadAndRunToolsAction.setStatusTip(self.tr("download file and run"))
+        self.connect(self.downloadAndRunToolsAction,SIGNAL("triggered()"),self.slotDownloadFileAndRun)
         self.isDownloadFileAndRun=False
 
-        self.stopProgramTools=QAction(QIcon(":/stop.png"),self.tr("Stop"),self) 
-        self.stopProgramTools.setStatusTip(self.tr("stop the program"))
-        self.connect(self.stopProgramTools,SIGNAL("triggered()"),self.slotStopProgram)
+        #self.stopProgramAction=QAction(QIcon(":/stop.png"),self.tr("Stop"),self)
+        self.stopProgramAction=QAction(self.tr("Stop"),self)
+        self.stopProgramAction.setStatusTip(self.tr("stop the program"))
+        self.connect(self.stopProgramAction,SIGNAL("triggered()"),self.slotStopProgram)
 
-        self.preferenceAction=QAction(QIcon(":/edit.png"),self.tr("Preferences"),self)
+        self.stopProgramToolsAction=QAction(QIcon(":/stop.png"),self.tr("Stop"),self)
+        self.stopProgramToolsAction.setStatusTip(self.tr("stop the program"))
+        self.connect(self.stopProgramToolsAction,SIGNAL("triggered()"),self.slotStopProgram)
+
+        #self.preferenceAction=QAction(QIcon(":/edit.png"),self.tr("Preferences"),self)
+        self.preferenceAction=QAction(self.tr("Preferences"),self)
         self.connect(self.preferenceAction,SIGNAL("triggered()"),self.slotPreferences)
         
-        self.initconfig=QAction(QIcon(":/init.png"),self.tr("InitConfig"),self)
+        #self.initconfig=QAction(QIcon(":/init.png"),self.tr("InitConfig"),self)
+        self.initconfig=QAction(self.tr("InitConfig"),self)
         self.connect(self.initconfig,SIGNAL("triggered()"),self.slotInitConfig)
 
-        self.burnfirmware=QAction(QIcon(":/burnFirmware.png"),self.tr("BurnFirmware"),self)
+        #self.burnfirmware=QAction(QIcon(":/burnFirmware.png"),self.tr("BurnFirmware"),self)
+        self.burnfirmware=QAction(self.tr("BurnFirmware"),self)
         self.connect(self.burnfirmware,SIGNAL("triggered()"),self.slotBurnFirmware)  
 #help
-        self.aboutAction=QAction(QIcon(":/about.png"),self.tr("Tutorial online"),self)  
+        #self.aboutAction=QAction(QIcon(":/about.png"),self.tr("Tutorial online"),self)
+        self.aboutAction=QAction(self.tr("Tutorial online"),self) 
         self.connect(self.aboutAction,SIGNAL("triggered()"),self.slotAbout)
 
     def createMenus(self):
@@ -469,7 +609,9 @@ class MainWidget(QMainWindow):
         self.fileMenu.addAction(self.fileSaveAction)
         self.fileMenu.addAction(self.fileSaveAsAction)
         self.fileMenu.addAction(self.refreshBoardFileAction)
-        self.fileMenu.addAction(self.exitAction)  
+        self.fileMenu.addAction(self.exitAction)
+
+        self.fileMenu.setStyleSheet("background-color: rgb(254,254,254);")
 #edit
         editMenu=self.menuBar().addMenu(self.tr("Edit"))  
         editMenu.addAction(self.copyAction)  
@@ -479,39 +621,59 @@ class MainWidget(QMainWindow):
         editMenu.addAction(self.undoAction)
         editMenu.addAction(self.syntaxCheckAction)
         editMenu.addAction(self.findAction)
-        editMenu.addAction(self.replaceAction)
+        #editMenu.addAction(self.replaceAction)
+
+        editMenu.setStyleSheet("background-color: rgb(254,254,254);")
 #Tools
         toolMenu=self.menuBar().addMenu(self.tr("Tools"))
         toolMenu.addAction(self.comMenuTools)
         toolMenu.addAction(self.boardMenuTools)
         toolMenu.addAction(self.downloadAction)
         toolMenu.addAction(self.downloadAndRunAction)
-        toolMenu.addAction(self.stopProgramTools)
+        toolMenu.addAction(self.stopProgramAction)
         toolMenu.addAction(self.burnfirmware)
         toolMenu.addAction(self.initconfig)
         toolMenu.addAction(self.preferenceAction)
+
+
+        toolMenu.setStyleSheet("background-color: rgb(254,254,254);")
         
         self.connect(toolMenu,SIGNAL("hovered(QAction*)"),self.slotToolMenuHover) 
 #Help
         aboutMenu=self.menuBar().addMenu(self.tr("Help"))
         aboutMenu.addAction(self.aboutAction)
+        
+        aboutMenu.setStyleSheet("background-color: rgb(254,254,254);")
+
+        self.menuBar().setStyleSheet("""QMenuBar {background-color: rgb(254, 254, 254);}
+                                        QMenuBar::item {background: rgb(254, 254, 254);}
+                                        QMenu::item::selected { background-color: rgb(255,239,227); color: #000; }
+                                        QMenuBar::item::selected {background-color: #FFEFE3;}""")
 
 #create toolBars
     def createToolBars(self):
         fileToolBar=self.addToolBar("File")
-        fileToolBar.addAction(self.fileNewAction)
-        fileToolBar.addAction(self.fileOpenAction)
-        fileToolBar.addAction(self.fileSaveAction)
-        fileToolBar.addAction(self.downloadAndRunAction)
-        fileToolBar.addAction(self.stopProgramTools)
-        fileToolBar.addAction(self.serialConnect)
-        fileToolBar.addAction(self.serialClose)
-        fileToolBar.addAction(self.undoAction)
-        fileToolBar.addAction(self.redoAction)
-        fileToolBar.addAction(self.syntaxCheckAction)
-        fileToolBar.addAction(self.clearTerminalAction)
-        self.serialClose.setVisible(False)
+        fileToolBar.addAction(self.fileNewToolsAction)
+        fileToolBar.addAction(self.fileOpenToolsAction)
+        fileToolBar.addAction(self.fileSaveToolsAction)
+        fileToolBar.addAction(self.downloadAndRunToolsAction)
+        fileToolBar.addAction(self.stopProgramToolsAction)
+        fileToolBar.addAction(self.serialConnectToolsAction)
+        fileToolBar.addAction(self.serialCloseToolsAction)
+        fileToolBar.addAction(self.undoToolsAction)
+        fileToolBar.addAction(self.redoToolsAction)
+        fileToolBar.addAction(self.syntaxCheckToolsAction)
+        fileToolBar.addAction(self.clearTerminalToolsAction)
+        self.serialCloseToolsAction.setVisible(False)
 
+        if sys.platform=="darwin":
+            self.setUnifiedTitleAndToolBarOnMac(True)
+        else:
+            self.setUnifiedTitleAndToolBarOnMac(False)
+
+        # #FFBE2B  #FF4E50
+        fileToolBar.setStyleSheet("""QToolBar {background-color: qlineargradient( y1: 0,  y2: 1,stop: 0 #FF4E50, stop: 1 #FFBE2B);spacing:8px;}""")
+        self.addToolBar(Qt.RightToolBarArea,fileToolBar)
 #create examples menu for File->Examples
     def createExampleMenu(self):
         #two follow lines mean:on PC conmon dir and board dir(contians:esp8266,esp32,pyboard,microbit)
@@ -762,6 +924,9 @@ class MainWidget(QMainWindow):
         #if self.fileName.find(rootDirectoryPath)>=0 or (self.fileName.find(":")>=0 and sys.platform=="win32"):
         #    self.pcOpenFile(self.fileName)
         #    return
+        elif sys.platform=="darwin" and self.fileName.find(rootDirectoryPath)>=0:
+            self.pcOpenFile(self.fileName)
+            return
         else:
             if self.editClassFileitem(self.fileName):
                 self.uitoctrlQueue.put("loadfile:::%s"%self.fileName)
@@ -772,6 +937,10 @@ class MainWidget(QMainWindow):
 
     def slotNewFile(self):
         self.tabWidget.createNewTab("untitled","",self.lexer)
+
+    def slotNewFileHover(self):
+        print("slotNewFileHover")
+        #self.fileNewToolsAction.setIcon(QIcon(":/clear.png"))
 
     def slotSaveFile(self):
         if self.tabWidget.currentWidget() is None:
@@ -797,6 +966,8 @@ class MainWidget(QMainWindow):
                 savefile=codecs.open(currentTempPath+str(filepath),'wb')
             #elif filepath.find(rootDirectoryPath)<0:
             #    savefile=codecs.open(currentTempPath+str(filepath),'wb')
+            elif sys.platform=="darwin" and filepath.find(rootDirectoryPath)<0:
+                savefile=codecs.open(currentTempPath+str(filepath),'wb')
             else:
                 savefile=open(filepath,'wb')
             '''
@@ -953,6 +1124,7 @@ class MainWidget(QMainWindow):
         if not self.myserial.ser.isOpen():
             #self.terminal.append("serial not open")
             return
+        
         self.uitoctrlQueue.put("treeModel")
 
     def slotCut(self):
@@ -988,7 +1160,7 @@ class MainWidget(QMainWindow):
             return
 
         self.tabWidget.currentWidget().markerDeleteAll()
-        self.tabWidget.currentWidget().setMarkerBackgroundColor(QColor(255,0,0))
+        #self.tabWidget.currentWidget().setMarkerBackgroundColor(QColor(255,0,0))
 
         syntaxCheckFilePath="%s/AppData/Local/uPyCraft/temp/syntaxCheck.py"%rootDirectoryPath
         syntaxCheckFileText=self.tabWidget.currentWidget().text()
@@ -1069,6 +1241,9 @@ class MainWidget(QMainWindow):
                         self.tabWidget.currentWidget().markerAdd((int(i.split(":")[2])-1),1)
                     elif sys.platform=="linux":
                         self.tabWidget.currentWidget().markerAdd((int(i.split(":")[1])-1),1)
+                    elif sys.platform=="darwin":
+                        print("platform1 darwin")
+                        self.tabWidget.currentWidget().markerAdd((int(i.split(":")[1])-1),1)
                     else:
                         print("other platform1.")
                         return
@@ -1080,7 +1255,7 @@ class MainWidget(QMainWindow):
                             appendMsg=appendMsg+":"+i[n]
                     self.terminal.append(appendMsg)
                         
-                self.tabWidget.currentWidget().setMarkerBackgroundColor(QColor(255,204,204))
+                self.tabWidget.currentWidget().setMarkerBackgroundColor(QColor(128,128,128))
 
             if stderr=="":
                 pass
@@ -1095,6 +1270,9 @@ class MainWidget(QMainWindow):
                             self.tabWidget.currentWidget().markerAdd((int(i.split(":")[2])-1),1)
                         elif sys.platform=="linux":
                             self.tabWidget.currentWidget().markerAdd((int(i.split(":")[1])-1),1)
+                        elif sys.platform=="darwin":
+                            print("platform2 darwin")
+                            self.tabWidget.currentWidget().markerAdd((int(i.split(":")[1])-1),1)
                         else:
                             print("other platform2.")
                             return
@@ -1106,7 +1284,7 @@ class MainWidget(QMainWindow):
                         self.terminal.append(appendMsg)
                         continue
                     self.terminal.append(i)
-                self.tabWidget.currentWidget().setMarkerBackgroundColor(QColor(255,204,204))
+                self.tabWidget.currentWidget().setMarkerBackgroundColor(QColor(128,128,128))
 
         self.terminal.append("syntax finish.")
 
@@ -1156,10 +1334,11 @@ class MainWidget(QMainWindow):
 
 
     def slotChooseCom(self,action):
+        #self.rootDevice.setIcon(QIcon(":/about.png"))
         if self.myserial.ser.isOpen():
             self.terminal.append("serial already opened")
-            self.serialConnect.setVisible(False)
-            self.serialClose.setVisible(True)
+            self.serialConnectToolsAction.setVisible(False)
+            self.serialCloseToolsAction.setVisible(True)
             return
         try:
             self.myserial.comChooseOk(action.text())
@@ -1271,14 +1450,14 @@ class MainWidget(QMainWindow):
 
         self.terminal.setEventFilterEnable(True)
 
-        self.serialConnect.setVisible(False)
-        self.serialClose.setVisible(True)
+        self.serialConnectToolsAction.setVisible(False)
+        self.serialCloseToolsAction.setVisible(True)
 
     def slotConnectSerial(self):
         if self.myserial.ser.isOpen():
             self.terminal.append("serial already opened.")
-            self.serialConnect.setVisible(False)
-            self.serialClose.setVisible(True)
+            self.serialConnectToolsAction.setVisible(False)
+            self.serialCloseToolsAction.setVisible(True)
             return
 
         configFile=open("%s/AppData/Local/uPyCraft/config.json"%rootDirectoryPath,'r')
@@ -1391,15 +1570,15 @@ class MainWidget(QMainWindow):
 
         self.terminal.setEventFilterEnable(True)
 
-        self.serialConnect.setVisible(False)
-        self.serialClose.setVisible(True)
+        self.serialConnectToolsAction.setVisible(False)
+        self.serialCloseToolsAction.setVisible(True)
         
     def slotCloseSerial(self):
         self.comActionGroup.setDisabled(False)  #enable choose serial
         if not self.myserial.ser.isOpen():
             self.terminal.append("already close.")
-            self.serialConnect.setVisible(True)
-            self.serialClose.setVisible(False)
+            self.serialConnectToolsAction.setVisible(True)
+            self.serialCloseToolsAction.setVisible(False)
             self.currentCom=""
             return
 
@@ -1421,8 +1600,8 @@ class MainWidget(QMainWindow):
         #        break
         #    self.slotCloseTab(self.tabWidget.currentTab)
         
-        self.serialConnect.setVisible(True)
-        self.serialClose.setVisible(False)
+        self.serialConnectToolsAction.setVisible(True)
+        self.serialCloseToolsAction.setVisible(False)
 
         self.terminal.clear()
         
@@ -1438,8 +1617,8 @@ class MainWidget(QMainWindow):
         self.emit(SIGNAL("initMessycode"))
         time.sleep(0.1)
         self.myserial.ser.close()
-        if self.currentBoard=="esp32" or self.currentBoard=="esp8266":
-            Esp.espCloseReset(self.currentCom,self.currentBoard)
+        #if self.currentBoard=="esp32" or self.currentBoard=="esp8266":
+        #    Esp.espCloseReset(self.currentCom,self.currentBoard)
         self.currentCom=""
         self.terminal.setEventFilterEnable(False)
 
@@ -1489,6 +1668,8 @@ class MainWidget(QMainWindow):
             afile=self.fileName
         elif sys.platform=="win32" and str(self.fileName).find(":")>=0:
             afile=self.fileName
+        elif sys.platform=="darwin" and str(self.fileName).find(rootDirectoryPath)>=0:
+            afile=self.fileName
         #if str(self.fileName).find(rootDirectoryPath)>=0 or (self.fileName.find(":")>=0 and sys.platform=="win32"):
         #    afile=self.fileName
         else:
@@ -1511,6 +1692,7 @@ class MainWidget(QMainWindow):
         
     def slotStopProgram(self):
         if self.myserial.ser.isOpen():
+            self.terminal.keyPressMsg="else"
             self.readwriteQueue.put("uitouart:::\x03")
             self.inDownloadFile=False
         else:
@@ -1518,6 +1700,7 @@ class MainWidget(QMainWindow):
         
 ############Tools->InitConfig
     def slotInitConfig(self):
+        
         confirmClose = QMessageBox.question(self,"Attention","sure to init?",
                                                     QMessageBox.Ok|QMessageBox.Cancel,
                                                     QMessageBox.Ok)
@@ -1656,6 +1839,9 @@ class MainWidget(QMainWindow):
                 elif sys.platform=="linux":
                     #subprocess.call(["open",str(filename)])
                     webbrowser.open(filename)
+                elif sys.platform=="darwin":#mac debug
+                    print("pcopenfile webbrowser")
+                    webbrowser.open(filename)
                 else:
                     print("other platform3.")
             return
@@ -1688,6 +1874,8 @@ class MainWidget(QMainWindow):
         if sys.platform=="linux" and str(filename).find(rootDirectoryPath)<0:
             return True
         elif sys.platform=="win32" and str(filename).find(":")<0:
+            return True
+        elif sys.platform=="darwin" and str(filename).find(rootDirectoryPath)<0:
             return True
         #if str(filename).find(rootDirectoryPath)<0:
         #    return True
@@ -1859,7 +2047,7 @@ class MainWidget(QMainWindow):
         else:
             self.terminal.append("None File")
 
-    def getPCLibFile(self,item,path):
+    def getPCLibFile(self,item,path):#mac debug
         if not os.path.exists(path):
             return
         libFileList=os.listdir(path)
@@ -1867,10 +2055,10 @@ class MainWidget(QMainWindow):
             if not os.path.isdir(path+"/"+i):
                 if i[0]=="." or i.find(".lnk")>0 or i.find(".")<0:
                     continue
-                itemLib=QStandardItem(i)
+                itemLib=QStandardItem(QIcon(":/treeFileOpen.png"),i)
                 item.appendRow(itemLib)
             else:
-                itemLib=QStandardItem(QIcon(":/fileopen.png"),i)
+                itemLib=QStandardItem(QIcon(":/treeMenuClosed.png"),i)
                 item.appendRow(itemLib)
                 self.getPCLibFile(itemLib,path+"/"+i)
 
@@ -1882,7 +2070,7 @@ class MainWidget(QMainWindow):
             self.getDefaultFile(itemDevice)
   
             item.removeRow(itemDevice.row())
-            itemDevice=QStandardItem(msg)
+            itemDevice=QStandardItem(QIcon(":/treeFileOpen.png"),msg)
             if self.myDefaultProgram==self.checkDefaultProgram:
                 itemDevice.setForeground(QBrush(QColor(255,0,0)))
                 
@@ -1892,7 +2080,7 @@ class MainWidget(QMainWindow):
             for i in msg:
                 k=eval("%s"%msg[i])
                 i=i.split("/")
-                itemDevice=QStandardItem(QIcon(":/fileopen.png"),"%s"%i[-1])
+                itemDevice=QStandardItem(QIcon(":/treeMenuClosed.png"),"%s"%i[-1])
                 item.appendRow(itemDevice)
                 self.createReflushTree(itemDevice,k)
         elif type(msg) is list:
@@ -1947,7 +2135,8 @@ class MainWidget(QMainWindow):
     def goProgram(self,filename):
         if filename=="":
             return
-        if str(filename).find(".py")<0:
+        if str(filename).find(".py")<0 and str(filename).find(".mpy")<0:
+            print("not py or mpy file.")
             return
 
         if self.myserial.ser.isOpen():
@@ -1969,6 +2158,8 @@ class MainWidget(QMainWindow):
         elif sys.platform=="win32" and str(self.fileName).find(":")>=0:
             self.pcOpenFile(self.fileName)
             return
+        elif sys.platform=="darwin" and str(self.fileName).find(rootDirectoryPath)>=0:
+            self.pcOpenFile(self.fileName)
         #if str(self.fileName).find(rootDirectoryPath)>=0:
         #    self.pcOpenFile(self.fileName)
         #    return
@@ -2005,6 +2196,9 @@ class MainWidget(QMainWindow):
         elif sys.platform=="win32" and str(self.fileName).find(":")>0:
             self.deletePCFile(self.fileName)
             return
+        elif sys.platform=="darwin" and str(self.fileName).find(rootDirectoryPath)>=0:
+            self.deletePCFile(self.fileName)
+            return
         
         #if str(self.fileName).find(rootDirectoryPath)>=0:        
         #    self.deletePCFile(self.fileName)
@@ -2034,6 +2228,9 @@ class MainWidget(QMainWindow):
         elif sys.platform=="win32" and str(self.fileName).find(":")>=0:
             self.terminal.append("This file not in board")
             return
+        elif sys.platform=="darwin" and str(self.fileName).find(rootDirectoryPath)>=0:
+            self.terminal.append("This file not in board")
+            return
         elif str(self.fileName).find(".py")<0:
             self.terminal.append("only set py file")
             return
@@ -2059,6 +2256,9 @@ class MainWidget(QMainWindow):
         elif sys.platform=="win32" and str(self.fileName).find(":")>0:
             self.terminal.append("not in board,no rename")
             return
+        elif sys.platform=="darwin" and str(self.fileName).find(rootDirectoryPath)>=0:
+            self.terminal.append("not in board,no rename")
+            return
         #if str(self.fileName).find(rootDirectoryPath)>=0:  
         #    self.terminal.append("not in board,no rename")
         #    return
@@ -2077,6 +2277,9 @@ class MainWidget(QMainWindow):
             self.terminal.append("not board file,no new dir")
             return
         elif sys.platform=="win32" and str(self.fileName).find(":")>0:
+            self.terminal.append("not board file,no new dir")
+            return
+        elif sys.platform=="darwin" and str(self.fileName).find(rootDirectoryPath)>=0:
             self.terminal.append("not board file,no new dir")
             return
         #if str(self.fileName).find(rootDirectoryPath)>=0:  
@@ -2259,6 +2462,10 @@ class MainWidget(QMainWindow):
         self.updateFirmwareBar.eraseEvent(per)
 
     def microbitUpdate(self):
+        #aaa=QMessageBox()
+        ##aaa.setIcon(QMessageBox.Question)
+        #aaa.exec()
+        #return
         microbitUP=QMessageBox.question(self,"microbit update",  
                                     "Please wait,untill the yellow light is not blink.ready to update?",
                                     QMessageBox.Ok|QMessageBox.Cancel,  
@@ -2432,6 +2639,8 @@ class MainWidget(QMainWindow):
             if sys.platform=="linux" and str(self.fileName).find(rootDirectoryPath)>=0:
                 goProgramFile = str(self.fileName).split("/")[-1]
             elif sys.platform=="win32" and str(self.fileName).find(":")>=0:
+                goProgramFile = str(self.fileName).split("/")[-1]
+            elif sys.platform=="darwin" and str(self.fileName).find(rootDirectoryPath)>=0:
                 goProgramFile = str(self.fileName).split("/")[-1]
             #if str(self.fileName).find(rootDirectoryPath)>=0:
             #    goProgramFile = str(self.fileName).split("/")[-1]
@@ -2650,8 +2859,8 @@ class MainWidget(QMainWindow):
         row=self.rootDevice.rowCount()    #clear board treemodel
         self.rootDevice.removeRows(0,row) #use for refresh treemodel,these two lines
         
-        self.serialConnect.setVisible(True)
-        self.serialClose.setVisible(False)
+        self.serialConnectToolsAction.setVisible(True)
+        self.serialCloseToolsAction.setVisible(False)
             
         self.readuart.exit()
         self.ctrl.exit()
@@ -2701,8 +2910,8 @@ class MainWidget(QMainWindow):
                 for j in self.serialComList:
                     self.emit(SIGNAL("timerSetComMenu"),j)
         if self.currentCom=="":
-            self.serialConnect.setVisible(True)
-            self.serialClose.setVisible(False)
+            self.serialConnectToolsAction.setVisible(True)
+            self.serialCloseToolsAction.setVisible(False)
         elif self.currentCom not in self.serialComList:
             self.currentCom=""
             self.emit(SIGNAL("timerCloseTerminal"))

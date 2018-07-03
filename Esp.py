@@ -546,7 +546,6 @@ class ESPLoader(object):
     def change_baud(self, baud):
         print("Changing baud rate to %d" % baud)
         self.command(self.ESP_CHANGE_BAUDRATE, struct.pack('<II', baud, 0))
-        print("Changed.")
         self._set_port_baudrate(baud)
         time.sleep(0.05)  # get rid of crap sent during baud rate change
         self.flush_input()
@@ -2017,7 +2016,10 @@ def Burn(obj,board,filename,port,erase=False,writeFlashAddr=0):
 
         if args.baud > initial_baud:
             try:
-                esp.change_baud(args.baud)
+                if board=='esp8266' and sys.platform=='darwin':
+                    esp.change_baud(115200)
+                else:
+                    esp.change_baud(args.baud)
             except NotImplementedInROMError:
                 print("WARNING: ROM doesn't support changing baud rate. Keeping initial baud rate %d" % initial_baud)
                 sys.stdout.flush()

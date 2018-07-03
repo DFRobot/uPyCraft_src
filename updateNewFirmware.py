@@ -10,17 +10,26 @@ from PyQt4.QtGui import *
 class updateNewFirmwareBar(QDialog):
     def __init__(self,windowname,isErase,isUPY,parent=None):
         super(updateNewFirmwareBar,self).__init__(parent)
+        self.setWindowFlags(Qt.WindowCloseButtonHint)#HelpButtonHint?
 
         self.setWindowTitle(windowname)
         self.setWindowIcon(QIcon(':/logo.png'))
 
         self.updateLabel=QLabel(self.tr("Burn"))
         self.updateBar=QProgressBar(self)
+        self.updateBar.setStyleSheet("""QProgressBar::chunk{background-color: qlineargradient( x1: 0,  x2: 1,stop: 0 #FF4E50, stop: 1 #FFBE2B);}""")
+        self.updateBar.setTextVisible(False)
+        self.updateBarLabel=QLabel(self.tr("0%"))
+        self.updateBarLabel.setStyleSheet("color:red;")
 
         self.isUPY=isUPY
         if isUPY:
             self.downloadLabel=QLabel(self.tr("Download"))
             self.downloadBar=QProgressBar(self)
+            self.downloadBar.setStyleSheet("""QProgressBar::chunk{background-color: qlineargradient( x1: 0,  x2: 1,stop: 0 #FF4E50, stop: 1 #FFBE2B);}""")
+            self.downloadBar.setTextVisible(False)
+            self.downloadBarLable=QLabel(self.tr("0%"))
+            self.downloadBarLable.setStyleSheet("color:red;")
 
         self.erasePer=0
 
@@ -30,28 +39,45 @@ class updateNewFirmwareBar(QDialog):
         if isErase:
             self.eraseBar=QProgressBar(self)
             self.eraseLabel=QLabel(self.tr("EraseFlash"))
+            self.eraseBar.setStyleSheet("""QProgressBar::chunk{background-color: qlineargradient( x1: 0,  x2: 1,stop: 0 #FF4E50, stop: 1 #FFBE2B);}""")
+            self.eraseBar.setTextVisible(False)
+            self.eraseLabelLabel=QLabel(self.tr("0%"))
+            self.eraseLabelLabel.setStyleSheet("color:red;")
+            
             if self.isUPY==True:
                 layout.addWidget(self.downloadLabel,0,0)
                 layout.addWidget(self.downloadBar,0,1)
+                layout.addWidget(self.downloadBarLable,0,2)
+                
                 layout.addWidget(self.eraseLabel,1,0)
                 layout.addWidget(self.eraseBar,1,1)
+                layout.addWidget(self.eraseLabelLabel,1,2)
+                
                 layout.addWidget(self.updateLabel,2,0)
                 layout.addWidget(self.updateBar,2,1)
+                layout.addWidget(self.updateBarLabel,2,2)
             else:
                 layout.addWidget(self.eraseLabel,0,0)
                 layout.addWidget(self.eraseBar,0,1)
+                layout.addWidget(self.eraseLabelLabel,0,2)
+                
                 layout.addWidget(self.updateLabel,1,0)
                 layout.addWidget(self.updateBar,1,1)
+                layout.addWidget(self.updateBarLabel,1,2)
             self.resize(600,150)
         else:
             if self.isUPY==True:
                 layout.addWidget(self.downloadLabel,0,0)
                 layout.addWidget(self.downloadBar,0,1)
+                layout.addWidget(self.downloadBarLable,0,2)
+                
                 layout.addWidget(self.updateLabel,1,0)
                 layout.addWidget(self.updateBar,1,1)
+                layout.addWidget(self.updateBarLabel,1,2)
             else:
                 layout.addWidget(self.updateLabel,0,0)
                 layout.addWidget(self.updateBar,0,1)
+                layout.addWidget(self.updateBarLabel,0,2)
             self.resize(600,100)
             
         self.setLayout(layout)
@@ -61,29 +87,41 @@ class updateNewFirmwareBar(QDialog):
         if per>=100:
             per=100
             self.downloadBar.setValue(per)
+            self.downloadBarLable.setText(self.tr("%d"%int(per)+"%"))
             return
         self.downloadBar.setValue(per)
+        self.downloadBarLable.setText(self.tr("%d"%int(per)+"%"))
+
 
     def eraseEvent(self,per):
         if per>=100:
             per=100
             self.eraseBar.setValue(per)
+            self.eraseLabelLabel.setText(self.tr("%d"%int(per)+"%"))
             return
         self.eraseBar.setValue(per)
+        self.eraseLabelLabel.setText(self.tr("%d"%int(per)+"%"))
 
     def updateEvent(self,per):
         if per>=100:
             per=100
             self.updateBar.setValue(per)
+            self.updateBarLabel.setText(self.tr("%d"%int(per)+"%"))
             self.close()
             return
         self.updateBar.setValue(per)
+        self.updateBarLabel.setText(self.tr("%d"%int(per)+"%"))
 
 class updateNewFirmware(QDialog):
     def __init__(self,windowname,isAuto=False,parent=None):
         super(updateNewFirmware,self).__init__(parent)
+        self.setWindowFlags(Qt.WindowCloseButtonHint)#HelpButtonHint?
         self.setWindowTitle(windowname)
         self.setWindowIcon(QIcon(':/logo.png'))
+        self.setStyleSheet("""QDialog{background-color: rgb(236, 236, 236);color:black;}
+                           QPushButton{background-color:rgb(253,97,72);color:white;}
+                           QPushButton:hover{background-color:rgb(212,212,212);color:black;}
+                           """)
         self.isAuto=isAuto
         if self.isAuto:
             Com_List=[]

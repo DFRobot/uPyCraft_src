@@ -202,6 +202,9 @@ class ctrlAction(QThread):
         elif sys.platform=="win32" and str(dragfile).find(":")<0:
             dropfile=dropfile + "/" + dragfile.split("/")[-1]
             self.rename(dragfile,dropfile)
+        elif sys.platform=="darwin" and str(dragfile).find(rootDirectoryPath)<0:
+            dropfile=dropfile + "/" + dragfile.split("/")[-1]
+            self.rename(dragfile,dropfile)
         #if str(dragfile).find(rootDirectoryPath)<0:
         #    dropfile=dropfile + "/" + dragfile.split("/")[-1]
         #    self.rename(dragfile,dropfile)
@@ -830,7 +833,7 @@ class ctrlAction(QThread):
             pass
         else:
             #if str(filename).find(":")>=0:
-            if (sys.platform=="linux" and str(filename).find(rootDirectoryPath)>=0) or (sys.platform=="win32" and str(filename).find(":")>=0):
+            if (sys.platform=="linux" and str(filename).find(rootDirectoryPath)>=0) or (sys.platform=="win32" and str(filename).find(":")>=0) or (sys.platform=="darwin" and str(filename).find(rootDirectoryPath)>=0):
             #if str(filename).find(rootDirectoryPath)>=0:
                 filelist=str(filename).split('/')
                 for afile in filelist:
@@ -945,6 +948,8 @@ class ctrlAction(QThread):
                 afile=str(filename)
             elif sys.platform=="win32" and str(filename).find(":")<0:
                 afile=str(filename)
+            elif sys.platform=="darwin" and str(filename).find(rootDirectoryPath)<0:
+                afile=str(filename)
             else:
                 if str(filename).find("/")>=0:
                     afile=str(filename).split("/")
@@ -968,6 +973,8 @@ class ctrlAction(QThread):
         elif sys.platform=="linux" and filename.find(rootDirectoryPath)<0:
             fileHandle=open(currentTempPath+filename,'rbU')
         elif sys.platform=="win32" and filename.find(":")<0:
+            fileHandle=open(currentTempPath+filename,'rbU')
+        elif sys.platform=="darwin" and filename.find(rootDirectoryPath)<0:
             fileHandle=open(currentTempPath+filename,'rbU')
         #elif filename.find(rootDirectoryPath)<0:
         #    fileHandle=open(currentTempPath+filename,'rbU')
