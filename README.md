@@ -181,7 +181,10 @@ Download QScintilla from https://sourceforge.net/projects/pyqt/files/QScintilla2
     sudo make
     sudo make install
     
+### Package uPyCraft<br>
 
+    pip install pyinstaller
+    pyinstaller -F uPyCraft.py
     
 
 
