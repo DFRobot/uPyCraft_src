@@ -123,6 +123,11 @@ qmake:
 ### SIP
 Download SIP from https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip-4.19.8.tar.gz/download<br>
 
+    cd Desktop
+    tar vxf sip-4.19.8.tar.gz
+    cd sip-4.19.8
+    sudo python3 configure.py
+    sudo make install
 
 ### PyQt4
 Download PyQt4 from https://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-4.12.1/PyQt4_gpl_mac-4.12.1.tar.gz/download<br>
