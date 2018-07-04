@@ -570,14 +570,11 @@ class myTreeView(QTreeView):
         elif self.ui.fileName=="/sd" or \
              (((sys.platform=="linux" and self.ui.fileName.find(rootDirectoryPath)>=0) or (sys.platform=="win32" and self.ui.fileName.find(":")>=0) or (sys.platform=="darwin" and self.ui.fileName.find(rootDirectoryPath)>=0)) and self.ui.fileName.split("/")[-1]=="uPy_lib"):
             pass
-        #elif self.ui.fileName.find(":")>=0 and self.ui.fileName.find("uPy_lib")>0:
         elif ((sys.platform=="linux" and self.ui.fileName.find(rootDirectoryPath)>=0) or (sys.platform=="win32" and self.ui.fileName.find(":")>=0) or (sys.platform=="darwin" and self.ui.fileName.find(rootDirectoryPath)>=0)) and self.ui.fileName.find("uPy_lib")>0:
             self.rightClickMenu.addAction(self.openFile)
             self.rightClickMenu.addAction(self.closeFile)
-        #elif self.ui.fileName.find(":")>=0 and self.ui.fileName.split("/")[-1]=="workSpace":
         elif ((sys.platform=="linux" and self.ui.fileName.find(rootDirectoryPath)>=0) or (sys.platform=="win32" and self.ui.fileName.find(":")>=0) or (sys.platform=="darwin" and self.ui.fileName.find(rootDirectoryPath)>=0)) and self.ui.fileName.split("/")[-1]=="workSpace":
             self.rightClickMenu.addAction(self.openFile)
-        #elif self.ui.fileName.find(":")>=0 and self.ui.fileName.find("workSpace")>0:
         elif ((sys.platform=="linux" and self.ui.fileName.find(rootDirectoryPath)>=0) or (sys.platform=="win32" and self.ui.fileName.find(":")>=0) or (sys.platform=="darwin" and self.ui.fileName.find(rootDirectoryPath)>=0)) and self.ui.fileName.find("workSpace")>0:
             self.rightClickMenu.addAction(self.openFile)
             self.rightClickMenu.addAction(self.closeFile)
@@ -891,7 +888,7 @@ class myTabWidget(QTabWidget):
         #显示缩进参考线
         editor.SendScintilla(QsciScintilla.SCI_SETINDENTATIONGUIDES,QsciScintilla.SC_IV_LOOKFORWARD)
         #设置匹配项的背景色
-        editor.setMatchedBraceBackgroundColor(QColor(255,184,255))
+        editor.setMatchedBraceBackgroundColor(QColor(30,120,184))
 
 
         
@@ -913,10 +910,7 @@ class myTabWidget(QTabWidget):
             self.setTabIcon(self.count()-1, QIcon(':/pc.png'))
             if self.ui.currentBoard=="microbit":
                 msg="from microbit import *\r#write your program:\r"
-        #elif str(filename).find(":")>0:
-        #elif str(filename).find(rootDirectoryPath)>=0:
         elif (sys.platform=="linux" and str(filename).find(rootDirectoryPath)>=0) or (sys.platform=="win32" and str(filename).find(":")>0) or (sys.platform=="darwin" and str(filename).find(rootDirectoryPath)>=0):
-        #elif sys.platform=="win32" or sys.platform=="linux":
             self.tabBar().setTabTextColor(self.count()-1, QColor(Qt.red))
             self.setTabIcon(self.count()-1, QIcon(':/pc.png'))
         else:

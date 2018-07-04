@@ -13,7 +13,7 @@ import zipfile
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-nowIDEVersion      ="0.31"
+nowIDEVersion      ="1.0"
 nowExamplesVersion="v0.0"
 rootDirectoryPath  =os.path.expanduser("~")
 rootDirectoryPath  =rootDirectoryPath.replace("\\","/")
@@ -120,9 +120,9 @@ class checkVersionExampleFire(QThread):
                     if self.downloadOk==False:
                         self.isDownload=False
                         break
-                    #print("111111111222222222")
+
                     #QMessageBox.information(self.ui,self.tr("attention"),self.tr("Please delete the old edition and use the updated one."),QMessageBox.Ok)
-                    #print("222222222222223333")
+
                     if self.examplesList[0]["version"]>nowExamplesVersion:
                         print("examples has new version")
                         self.emit(SIGNAL("updateThing"),"update uPyCraft Examples","There is a new version available for EXAMPLES, would you like to upgrade now?")

@@ -42,7 +42,7 @@ from microbit_api               import MICROPYTHON_APIS
 from SYUAN import syuan
 
 mainShow=True
-nowIDEVersion      ="0.31"
+nowIDEVersion      ="1.0"
 isCheckFirmware    =False
 rootDirectoryPath  =os.path.expanduser("~")
 rootDirectoryPath  =rootDirectoryPath.replace("\\","/")
@@ -266,13 +266,6 @@ class MainWidget(QMainWindow):
         self.lexer.setColor( QColor(165,152,36), QsciLexerPython.DoubleQuotedString )
         self.lexer.setColor( QColor(165,152,36), QsciLexerPython.SingleQuotedString )
 
-
-        
-
-        
-
-
-
         #self.lexer.setIndentationWarning(QsciLexerPython.Spaces)
 
     def createTerminal(self):
@@ -371,7 +364,6 @@ class MainWidget(QMainWindow):
         self.fileNewToolsAction.setShortcut("Ctrl+N")  
         self.fileNewToolsAction.setStatusTip(self.tr("create a new file"))  
         self.connect(self.fileNewToolsAction,SIGNAL("triggered()"),self.slotNewFile)
-        #self.connect(self.fileNewToolsAction,SIGNAL("hovered()"),self.slotNewFileHover)
 
         #self.fileSaveAction=QAction(QIcon(":/save.png"),self.tr("Save"),self)
         self.fileSaveAction=QAction(self.tr("Save"),self)  
@@ -477,10 +469,6 @@ class MainWidget(QMainWindow):
         self.findAction=QAction(self.tr("find replace"),self)
         self.findAction.setShortcut("Ctrl+F")
         self.connect(self.findAction,SIGNAL("triggered()"),self.slotFindReplaceText)
-
-        #self.replaceAction=QAction(QIcon(":/insted.png"),self.tr("replace"),self)
-        #self.replaceAction.setShortcut("Ctrl+H")
-        #self.connect(self.replaceAction,SIGNAL("triggered()"),self.slotFindReplaceText)
 #tools
         #self.comMenuTools=QAction(QIcon(":/serial.png"),self.tr("Serial"),self)
         self.comMenuTools=QAction(self.tr("Serial"),self)
@@ -557,7 +545,6 @@ class MainWidget(QMainWindow):
         self.boardMenu.setStyleSheet("""QMenu {background-color: rgb(254,254,254);}
                                    QMenu::item::selected { background-color: rgb(255,239,227); color: #000;}""")
 
-
         #self.downloadAction=QAction(QIcon(":/download.png"),self.tr("Download"),self)
         self.downloadAction=QAction(self.tr("Download"),self)
         self.downloadAction.setStatusTip(self.tr("download file to the board"))
@@ -621,7 +608,6 @@ class MainWidget(QMainWindow):
         editMenu.addAction(self.undoAction)
         editMenu.addAction(self.syntaxCheckAction)
         editMenu.addAction(self.findAction)
-        #editMenu.addAction(self.replaceAction)
 
         editMenu.setStyleSheet("background-color: rgb(254,254,254);")
 #Tools
@@ -634,7 +620,6 @@ class MainWidget(QMainWindow):
         toolMenu.addAction(self.burnfirmware)
         toolMenu.addAction(self.initconfig)
         toolMenu.addAction(self.preferenceAction)
-
 
         toolMenu.setStyleSheet("background-color: rgb(254,254,254);")
         
@@ -914,16 +899,12 @@ class MainWidget(QMainWindow):
             self.terminal.append("current version only open py txt json ini file.")
             return
         
-        #if self.fileName.find(":")>=0:
         if sys.platform=="linux" and self.fileName.find(rootDirectoryPath)>=0:
             self.pcOpenFile(self.fileName)
             return
         elif sys.platform=="win32" and self.fileName.find(":")>=0:
             self.pcOpenFile(self.fileName)
             return
-        #if self.fileName.find(rootDirectoryPath)>=0 or (self.fileName.find(":")>=0 and sys.platform=="win32"):
-        #    self.pcOpenFile(self.fileName)
-        #    return
         elif sys.platform=="darwin" and self.fileName.find(rootDirectoryPath)>=0:
             self.pcOpenFile(self.fileName)
             return
@@ -933,14 +914,9 @@ class MainWidget(QMainWindow):
                 pass
             else:
                 print("double false")
-        print("double clicked")
 
     def slotNewFile(self):
         self.tabWidget.createNewTab("untitled","",self.lexer)
-
-    def slotNewFileHover(self):
-        print("slotNewFileHover")
-        #self.fileNewToolsAction.setIcon(QIcon(":/clear.png"))
 
     def slotSaveFile(self):
         if self.tabWidget.currentWidget() is None:
@@ -959,29 +935,15 @@ class MainWidget(QMainWindow):
             print(filepath)
             if tabname[0] != "*":#tabname have *,means it's changed,can be save
                 return
-            #elif filepath.find(":")<0:
             elif sys.platform=="linux" and filepath.find(rootDirectoryPath)<0:
                 savefile=codecs.open(currentTempPath+str(filepath),'wb')
             elif sys.platform=="win32" and  filepath.find(":")<0:
                 savefile=codecs.open(currentTempPath+str(filepath),'wb')
-            #elif filepath.find(rootDirectoryPath)<0:
-            #    savefile=codecs.open(currentTempPath+str(filepath),'wb')
             elif sys.platform=="darwin" and filepath.find(rootDirectoryPath)<0:
                 savefile=codecs.open(currentTempPath+str(filepath),'wb')
             else:
                 savefile=open(filepath,'wb')
-            '''
-            if self.saveStr.find("\r\n")>=0:
-                self.saveStr = self.saveStr.replace("\n","")
-            elif self.saveStr.find("\r\n")<0 and self.saveStr.find("\n")>0:
-                self.saveStr = self.saveStr.replace("\n","\r")
-            elif self.saveStr.find("\r")>=0 and self.saveStr.find("\n")<0:
-                pass
-            elif self.saveStr.find("\r")<0 and self.saveStr.find("\n")>=0:
-                self.saveStr = self.saveStr.replace("\n","\r")
-            else:
-                print("Err for slotSaveFile")
-            '''
+
             self.saveStr=self.saveStr.replace("\r\n","\r")
             self.saveStr=self.saveStr.replace("\n","\r")
             saveStrSplit = self.saveStr.split("\r")
@@ -1004,18 +966,7 @@ class MainWidget(QMainWindow):
         if filename:
             self.saveStr=self.tabWidget.currentWidget().text()
             savefile=open(filename,'wb')
-            '''
-            if self.saveStr.find("\r\n")>=0:
-                self.saveStr = self.saveStr.replace("\n","")
-            elif self.saveStr.find("\r\n")<0 and self.saveStr.find("\n")>0:
-                self.saveStr = self.saveStr.replace("\n","\r")
-            elif self.saveStr.find("\r")>=0 and self.saveStr.find("\n")<0:
-                pass
-            elif self.saveStr.find("\r")<0 and self.saveStr.find("\n")>=0:
-                self.saveStr = self.saveStr.replace("\n","\r")
-            else:
-                print("Err for slotSaveFile")
-            '''
+
             self.saveStr=self.saveStr.replace("\r\n","\r")
             self.saveStr=self.saveStr.replace("\n","\r")
             saveStrSplit = self.saveStr.split("\r")
@@ -1072,18 +1023,7 @@ class MainWidget(QMainWindow):
         self.fileName=self.workspacePath+"/"+tabname
         self.str = self.tabWidget.currentWidget().text()
         savefile=open(self.fileName,'wb')
-        '''
-        if self.saveStr.find("\r\n")>=0:
-            self.saveStr = self.saveStr.replace("\n","")
-        elif self.saveStr.find("\r\n")<0 and self.saveStr.find("\n")>0:
-            self.saveStr = self.saveStr.replace("\n","\r")
-        elif self.saveStr.find("\r")>=0 and self.saveStr.find("\n")<0:
-            pass
-        elif self.saveStr.find("\r")<0 and self.saveStr.find("\n")>=0:
-            self.saveStr = self.saveStr.replace("\n","\r")
-        else:
-            print("Err for slotSaveFile")
-        '''
+
         self.saveStr=self.saveStr.replace("\r\n","\r")
         self.saveStr=self.saveStr.replace("\n","\r")
         saveStrSplit = self.saveStr.split("\r")
@@ -1549,7 +1489,6 @@ class MainWidget(QMainWindow):
         time.sleep(0.005)
         self.readuart.start()
 
-
         self.uitoctrlQueue.put("importOs")
         time.sleep(0.05)
 
@@ -1663,15 +1602,12 @@ class MainWidget(QMainWindow):
             self.inDownloadFile=False
             return False
 
-        #if str(self.fileName).find(":")>=0:
         if sys.platform=="linux" and str(self.fileName).find(rootDirectoryPath)>=0:
             afile=self.fileName
         elif sys.platform=="win32" and str(self.fileName).find(":")>=0:
             afile=self.fileName
         elif sys.platform=="darwin" and str(self.fileName).find(rootDirectoryPath)>=0:
             afile=self.fileName
-        #if str(self.fileName).find(rootDirectoryPath)>=0 or (self.fileName.find(":")>=0 and sys.platform=="win32"):
-        #    afile=self.fileName
         else:
             afile=self.fileName
             myfile=open(str(currentTempPath+afile[1:]),'w',encoding='utf-8')
@@ -1870,15 +1806,13 @@ class MainWidget(QMainWindow):
                         self.tabWidget.setCurrentWidget(self.tabWidget.widget(j))
                 print("%s already exist"%filename)
                 return False
-        #if str(filename).find(":")<0:
         if sys.platform=="linux" and str(filename).find(rootDirectoryPath)<0:
             return True
         elif sys.platform=="win32" and str(filename).find(":")<0:
             return True
         elif sys.platform=="darwin" and str(filename).find(rootDirectoryPath)<0:
             return True
-        #if str(filename).find(rootDirectoryPath)<0:
-        #    return True
+
         return True
             
     def asciiTOutf8(self,path):
@@ -1913,10 +1847,14 @@ class MainWidget(QMainWindow):
         self.autoAPI.prepare()
 
         self.exampleTools.setMenu(None)
-        self.exampleMenu.clear()
+        #self.exampleMenu.clear()   #QMenu.clear is not work
+        self.exampleMenu=QMenu(self.tr("example"))
+        self.connect(self.exampleMenu,SIGNAL("triggered(QAction*)"),self.showExamples)
+
+        self.exampleMenu.setStyleSheet("""QMenu {background-color: rgb(254,254,254);}
+                                   QMenu::item::selected { background-color: rgb(255,239,227); color: #000;}""")
 
         self.createExampleMenu()
-        #functionList.clear()
 
     def boardEsp8266(self):
         self.currentBoard="esp8266"
@@ -1926,7 +1864,12 @@ class MainWidget(QMainWindow):
         self.autoAPI.prepare()
 
         self.exampleTools.setMenu(None)
-        self.exampleMenu.clear()
+        #self.exampleMenu.clear()    #QMenu.clear is not work
+        self.exampleMenu=QMenu(self.tr("example"))
+        self.connect(self.exampleMenu,SIGNAL("triggered(QAction*)"),self.showExamples)
+
+        self.exampleMenu.setStyleSheet("""QMenu {background-color: rgb(254,254,254);}
+                                   QMenu::item::selected { background-color: rgb(255,239,227); color: #000;}""")
 
         self.createExampleMenu()
         
@@ -1939,7 +1882,7 @@ class MainWidget(QMainWindow):
         self.autoAPI.prepare()
         
         self.exampleTools.setMenu(None)
-        self.exampleMenu.clear()
+        self.exampleMenu.clear()    #QMenu.clear is not work,pyboard not use Communicate
 
         self.createExampleMenu()
     def boardMicrobit(self):
@@ -1952,11 +1895,11 @@ class MainWidget(QMainWindow):
 
         for i in MICROBIT_QSCI_APIS:
             self.autoAPI.add(i)
-        self.autoAPI.clear()
+        self.autoAPI.clear()  
         self.autoAPI.prepare()
         
         self.exampleTools.setMenu(None)
-        self.exampleMenu.clear()
+        self.exampleMenu.clear()    #QMenu.clear is not work,microbit not use Communicate
         
         self.createExampleMenu()
 
@@ -2160,9 +2103,6 @@ class MainWidget(QMainWindow):
             return
         elif sys.platform=="darwin" and str(self.fileName).find(rootDirectoryPath)>=0:
             self.pcOpenFile(self.fileName)
-        #if str(self.fileName).find(rootDirectoryPath)>=0:
-        #    self.pcOpenFile(self.fileName)
-        #    return
         
         if str(self.fileName).find(".py")>0 or str(self.fileName).find(".txt")>0 or str(self.fileName).find(".json")>0 or str(self.fileName).find(".ini")>0:
             pass
@@ -2189,7 +2129,6 @@ class MainWidget(QMainWindow):
     def treeRightMenuDeleteFile(self):
         if self.fileName=='':
             return
-        #if str(self.fileName).find(":")>0:
         if sys.platform=="linux" and str(self.fileName).find(rootDirectoryPath)>=0:
             self.deletePCFile(self.fileName)
             return
@@ -2199,10 +2138,6 @@ class MainWidget(QMainWindow):
         elif sys.platform=="darwin" and str(self.fileName).find(rootDirectoryPath)>=0:
             self.deletePCFile(self.fileName)
             return
-        
-        #if str(self.fileName).find(rootDirectoryPath)>=0:        
-        #    self.deletePCFile(self.fileName)
-        #    return
         
         deleteText="confirm delete %s?"%str(self.fileName)
 
@@ -2221,7 +2156,6 @@ class MainWidget(QMainWindow):
         if not self.myserial.ser.isOpen():
             return
 
-        #if str(self.fileName).find(":")>0:
         if sys.platform=="linux" and str(self.fileName).find(rootDirectoryPath)>=0:
             self.terminal.append("This file not in board")
             return
@@ -2235,21 +2169,11 @@ class MainWidget(QMainWindow):
             self.terminal.append("only set py file")
             return
         
-        
-        
-        #if str(self.fileName).find(rootDirectoryPath)>=0:  
-        #    self.terminal.append("This file not in board")
-        #    return
-        #elif str(self.fileName).find(".py")<0:
-        #    self.terminal.append("only set py file")
-        #    return
-        
         self.myDefaultProgram=self.fileName
 
         self.uitoctrlQueue.put("setdefaultprogram:::%s"%self.myDefaultProgram)
 
     def treeRightMenuRename(self):
-        #if str(self.fileName).find(":")>0:
         if sys.platform=="linux" and str(self.fileName).find(rootDirectoryPath)>=0:
             self.terminal.append("not in board,no rename")
             return
@@ -2259,9 +2183,6 @@ class MainWidget(QMainWindow):
         elif sys.platform=="darwin" and str(self.fileName).find(rootDirectoryPath)>=0:
             self.terminal.append("not in board,no rename")
             return
-        #if str(self.fileName).find(rootDirectoryPath)>=0:  
-        #    self.terminal.append("not in board,no rename")
-        #    return
         
         if not self.myserial.ser.isOpen():
             return
@@ -2272,7 +2193,6 @@ class MainWidget(QMainWindow):
         self.getTreeRightMenuRename.exec_()
 
     def treeRightMenuNewDir(self):
-        #if str(self.fileName).find(":")>0:
         if sys.platform=="linux" and str(self.fileName).find(rootDirectoryPath)>=0:
             self.terminal.append("not board file,no new dir")
             return
@@ -2282,9 +2202,7 @@ class MainWidget(QMainWindow):
         elif sys.platform=="darwin" and str(self.fileName).find(rootDirectoryPath)>=0:
             self.terminal.append("not board file,no new dir")
             return
-        #if str(self.fileName).find(rootDirectoryPath)>=0:  
-        #    self.terminal.append("not board file,no new dir")
-        #    return
+
         if not self.myserial.ser.isOpen():
             return
         if self.currentBoard=="microbit":
@@ -2462,10 +2380,6 @@ class MainWidget(QMainWindow):
         self.updateFirmwareBar.eraseEvent(per)
 
     def microbitUpdate(self):
-        #aaa=QMessageBox()
-        ##aaa.setIcon(QMessageBox.Question)
-        #aaa.exec()
-        #return
         microbitUP=QMessageBox.question(self,"microbit update",  
                                     "Please wait,untill the yellow light is not blink.ready to update?",
                                     QMessageBox.Ok|QMessageBox.Cancel,  
@@ -2635,15 +2549,12 @@ class MainWidget(QMainWindow):
 
         if self.isDownloadFileAndRun:
             self.isDownloadFileAndRun=False
-            #if str(self.fileName).find(":")>=0:
             if sys.platform=="linux" and str(self.fileName).find(rootDirectoryPath)>=0:
                 goProgramFile = str(self.fileName).split("/")[-1]
             elif sys.platform=="win32" and str(self.fileName).find(":")>=0:
                 goProgramFile = str(self.fileName).split("/")[-1]
             elif sys.platform=="darwin" and str(self.fileName).find(rootDirectoryPath)>=0:
                 goProgramFile = str(self.fileName).split("/")[-1]
-            #if str(self.fileName).find(rootDirectoryPath)>=0:
-            #    goProgramFile = str(self.fileName).split("/")[-1]
             else:
                 goProgramFile=self.fileName
             

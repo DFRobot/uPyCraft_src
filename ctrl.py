@@ -195,7 +195,6 @@ class ctrlAction(QThread):
                 
         
     def dragChangeDir(self,dragfile,dropfile):
-        #if str(dragfile).find(":")<0:#device Internal move
         if sys.platform=="linux" and str(dragfile).find(rootDirectoryPath)<0:
             dropfile=dropfile + "/" + dragfile.split("/")[-1]
             self.rename(dragfile,dropfile)
@@ -205,9 +204,6 @@ class ctrlAction(QThread):
         elif sys.platform=="darwin" and str(dragfile).find(rootDirectoryPath)<0:
             dropfile=dropfile + "/" + dragfile.split("/")[-1]
             self.rename(dragfile,dropfile)
-        #if str(dragfile).find(rootDirectoryPath)<0:
-        #    dropfile=dropfile + "/" + dragfile.split("/")[-1]
-        #    self.rename(dragfile,dropfile)
         else:#device external drag and download
             dropfile=dropfile + "/" + dragfile.split("/")[-1]
             self.dropDownFileName=dropfile
@@ -832,9 +828,7 @@ class ctrlAction(QThread):
         if str(filename).find("/")<0:
             pass
         else:
-            #if str(filename).find(":")>=0:
             if (sys.platform=="linux" and str(filename).find(rootDirectoryPath)>=0) or (sys.platform=="win32" and str(filename).find(":")>=0) or (sys.platform=="darwin" and str(filename).find(rootDirectoryPath)>=0):
-            #if str(filename).find(rootDirectoryPath)>=0:
                 filelist=str(filename).split('/')
                 for afile in filelist:
                     if afile.find(".py")>=0:
@@ -941,9 +935,6 @@ class ctrlAction(QThread):
         if str(filename).find(".py")>=0:
             if self.dragDropModel==True:
                 afile=self.dropDownFileName
-            #elif str(filename).find(":")<0:
-            #elif str(filename).find(rootDirectoryPath)<0:
-            #    afile=str(filename)
             elif sys.platform=="linux" and str(filename).find(rootDirectoryPath)<0:
                 afile=str(filename)
             elif sys.platform=="win32" and str(filename).find(":")<0:
@@ -969,15 +960,12 @@ class ctrlAction(QThread):
                 self.emit(SIGNAL("uiRecvFromCtrl"),"no suport for download dir")
                 return
             afile=self.dropDownFileName
-        #elif filename.find(":")<0:
         elif sys.platform=="linux" and filename.find(rootDirectoryPath)<0:
             fileHandle=open(currentTempPath+filename,'rbU')
         elif sys.platform=="win32" and filename.find(":")<0:
             fileHandle=open(currentTempPath+filename,'rbU')
         elif sys.platform=="darwin" and filename.find(rootDirectoryPath)<0:
             fileHandle=open(currentTempPath+filename,'rbU')
-        #elif filename.find(rootDirectoryPath)<0:
-        #    fileHandle=open(currentTempPath+filename,'rbU')
         else:
             myfile=open(currentTempPath+"/"+str(filename.split("/")[-1]),"w",encoding='UTF-8')
             filemsg=""
