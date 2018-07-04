@@ -68,6 +68,26 @@ Download PyQt4_gpl_x11-4.12 from https://sourceforge.net/projects/pyqt/files/PyQ
     sudo python configure.py
     sudo make
     sudo make install
+### QScintilla
+Download QScintilla from https://sourceforge.net/projects/pyqt/files/QScintilla2/QScintilla-2.9.1/<br>
+
+    tar zxvf QScintilla-2.9.1.tar.gz
+    cd QScintilla-2.9.1
+    #Qt4Qt5
+    cd Qt4Qt5
+    qmake
+    sudo make
+    sudo make install
+    #Python
+    cd ../Python
+    python3 configure.py
+    sudo make
+    sudo make install
+    #designer-Qt4Qt5
+    cd ../designer-Qt4Qt5
+    qmake designer.pro
+    sudo make
+    sudo make install
 ### Package uPyCraft<br>
     pip install pyinstaller
     pyinstaller -F uPyCraft.py
