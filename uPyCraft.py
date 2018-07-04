@@ -1864,13 +1864,8 @@ class MainWidget(QMainWindow):
         self.autoAPI.prepare()
 
         self.exampleTools.setMenu(None)
-        #self.exampleMenu.clear()    #QMenu.clear is not work
-        self.exampleMenu=QMenu(self.tr("example"))
-        self.connect(self.exampleMenu,SIGNAL("triggered(QAction*)"),self.showExamples)
-
-        self.exampleMenu.setStyleSheet("""QMenu {background-color: rgb(254,254,254);}
-                                   QMenu::item::selected { background-color: rgb(255,239,227); color: #000;}""")
-
+        self.exampleMenu.clear()    #QMenu.clear is not work
+        
         self.createExampleMenu()
         
     def boardPyboard(self):
