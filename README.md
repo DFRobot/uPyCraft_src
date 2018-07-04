@@ -1,6 +1,7 @@
 # uPyCraft_src
-#### uPyCraft is an IDE designed for micropython that supports Windows 7, Windows 8, Windows 10, MAC OSX 10.11, and above.To make it easier for users to use, uPyCraft is released in green in all systems, no need to install.
+#### uPyCraft is an IDE designed for micropython that supports Windows 7, Windows 8, Windows 10, Linux, MAC OSX 10.11, and above.To make it easier for users to use, uPyCraft is released in green in all systems, no need to install.
 
+# Windows
 ## Installation
 This requires you to have python3.4, pyqt4, py2exe, qsci, pyserial and pyflakes installed.
 
@@ -14,8 +15,9 @@ This requires you to have python3.4, pyqt4, py2exe, qsci, pyserial and pyflakes 
         
     pyserial:pip install pyserial 
     
-    py2exe  :pip install py2exe 
-    
+    py2exe  :pip install py2exe
+        Python34/Lib/site-packages/py2exe/icons.py Modify lines89:if iconheader.idCount>10 -> if iconheader.idCount>20
+        
     pyflakes:pip install pyflakes 
         find api.py and replace with pyflakesChange/api.py 
     
@@ -39,6 +41,33 @@ This requires you to have python3.4, pyqt4, py2exe, qsci, pyserial and pyflakes 
 ## Running
 Open uPyCraft.py with python3.4 IDE, click the run module button/F5 to run.
 
-## pakege uPyCraft
-uPyCraft.exe will created in directory dist/ .
-  
+## Package uPyCraft
+uPyCraft.exe will be created in directory dist/ .
+
+
+
+# Linux
+## Environment
+ubuntu16.04 LTS     Python3.5   PyQt4
+## Install
+### SIP<br>
+Download SIP from https://riverbankcomputing.com/software/sip/download <br>
+
+    tar zxvf sip-4.19.tar.gz -C /home/PyQt
+    sudo python configure.py
+    sudo make install
+### QT support library<br>
+
+    sudo apt-get install qt4-dev-tools qt4-doc qt4-qtconfig qt4-demos qt4-designer
+    sudo apt-get install libqwt5-qt4 libqwt5-qt4-dev
+### PyQt4<br>
+Download PyQt4_gpl_x11-4.12 from https://sourceforge.net/projects/pyqt/files/PyQt4/ <br>
+
+    tar zxvf PyQt4_gpl_x11-4.12.tar.gz -C /home/PyQt
+    cd /home/PyQt/PyQt4_gpl_x11-4.12
+    sudo python configure.py
+    sudo make
+    sudo make install
+### Package uPyCraft<br>
+    pip install pyinstaller
+    pyinstaller -F uPyCraft.py
