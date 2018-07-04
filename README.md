@@ -120,7 +120,19 @@ qmake:
     QMake version 2.01a
     Using Qt version 4.8.7 in /usr/local/Trolltech/Qt-4.8.7/lib
     
-###SIP
+### SIP
+Download SIP from https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip-4.19.8.tar.gz/download<br>
+
+
+### PyQt4
+Download PyQt4 from https://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-4.12.1/PyQt4_gpl_mac-4.12.1.tar.gz/download<br>
+
+
+### QScintilla
+Download QScintilla from https://sourceforge.net/projects/pyqt/files/QScintilla2/QScintilla-2.9.1/QScintilla-gpl-2.9.1.tar.gz/download<br>
+
+
+
 
 
 
