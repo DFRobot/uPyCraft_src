@@ -80,3 +80,6 @@ os 10.11 Python3.5 PyQt4
 ## Install
 ### qt4.8.7<br>
 Download qt4.8.7 from http://mirrors.ustc.edu.cn/qtproject/archive/qt/4.8/4.8.7/qt-everywhere-opensource-src-4.8.7.tar.gz<br>
+    cd Desktop
+    tar vxf qt-everywhere-opensource-src-4.8.7.tar.gz
+
