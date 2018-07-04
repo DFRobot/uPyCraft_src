@@ -132,10 +132,37 @@ Download SIP from https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip
 ### PyQt4
 Download PyQt4 from https://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-4.12.1/PyQt4_gpl_mac-4.12.1.tar.gz/download<br>
 
+    cd Desktop
+    tar vxf PyQt4_gpl_mac-4.12.1.tar.gz
+    cd PyQt4_gpl_mac_4.12.1
+    sudo python3 configure.py
+    sudo make #20min
+    sudo make install
 
 ### QScintilla
 Download QScintilla from https://sourceforge.net/projects/pyqt/files/QScintilla2/QScintilla-2.9.1/QScintilla-gpl-2.9.1.tar.gz/download<br>
 
+    cd Desktop
+    tar vxf QScintilla-gpl-2.9.1.tar.gz
+    cd QScintilla-gpl-2.9.1
+    #Qt4Qt5
+    cd Qt4Qt5
+    qmake
+    sudo make
+    sudo make install
+    #Python
+    cd ../Python
+    python3 configure.py
+    sudo make
+    sudo make install
+    #designer-Qt4Qt5
+    cd ../designer-Qt4Qt5
+    qmake designer.pro
+    sudo make
+    sudo make install
+    
+
+    
 
 
 
