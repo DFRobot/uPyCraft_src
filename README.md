@@ -119,6 +119,9 @@ qmake:
     qmake -v
     QMake version 2.01a
     Using Qt version 4.8.7 in /usr/local/Trolltech/Qt-4.8.7/lib
+    
+###SIP
+
 
 
 
