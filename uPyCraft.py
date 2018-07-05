@@ -39,7 +39,7 @@ from check                      import checkVersionExampleFire, attentionUpdata,
 from threadDownloadFirmware     import threadDownloadFirmware, threadUserFirmware
 from microbit_api               import MICROPYTHON_APIS
 
-from SYUAN import syuan
+from SourceCodePro import SourceCodePro
 
 mainShow=True
 nowIDEVersion      ="1.0"
@@ -196,32 +196,32 @@ class MainWidget(QMainWindow):
             fonts=os.listdir(FONTDIRS)
             flags=False
         elif sys.platform.startswith('darwin'):#for mac
-            FONTDIRS=os.path.join(os.environ['PWD'])
+            FONTDIRS=rootDirectoryPath+"/Library/Fonts"
             fonts=os.listdir(FONTDIRS)
             flags=False
         if fonts==None:
             return
         for filename in fonts:
-            if(filename.upper().find('SYUAN.TTF')==0):
+            if(filename.upper().find('SOURCECODEPRO.TTF')==0):
                 flags=True
                 break
         if flags is False:
-            checkfont=QMessageBox.question(self,"SYUAN Font",  
-                                    "Please install SYUAN font",
+            checkfont=QMessageBox.question(self,"SourceCodePro Font",  
+                                    "Please install SourceCodePro font",
                                     QMessageBox.Ok|QMessageBox.Cancel,  
                                     QMessageBox.Ok)  
             if checkfont==QMessageBox.Ok:
-                ttf=binascii.unhexlify(syuan)
-                fp=open('./SYUAN.TTF','wb')
+                ttf=binascii.unhexlify(SourceCodePro)
+                fp=open(rootDirectoryPath+'/Desktop/'+'SourceCodePro.ttf','wb')
                 fp.write(ttf)
                 fp.close()
                 if sys.platform.startswith('win32') or sys.platform.startswith('cygwin'):
-                    os.system('SYUAN.TTF')
+                    os.system('SourceCodePro.ttf')
                 elif sys.platform.startswith('darwin'):
-                    subprocess.call(['open','SYUAN.TTF'])
-                #os.remove("SYUAN.TTF")
+                    subprocess.call(['open',rootDirectoryPath+'/Desktop/'+'SourceCodePro.ttf'])
+                #os.remove("SourceCodePro.ttf")
 						  
-        font=QFont(self.tr("syuan"),10)
+        font=QFont(self.tr("Source Code Pro"),10)
         QApplication.setFont(font)
 
     def createTree(self):
@@ -281,7 +281,7 @@ class MainWidget(QMainWindow):
     def createTabWidget(self):
         self.tabWidget=myTabWidget(self.editorRightMenu,self.fileitem,self)
         self.tabWidget.setTabsClosable(True)
-        self.tabWidget.setFont(QFont(self.tr("syuan"),10,100))
+        self.tabWidget.setFont(QFont(self.tr("Source Code Pro"),10,100))
         self.tabWidget.setStyleSheet(""" QWidget{background-color: qlineargradient(x1: 0, x2: 1,stop: 0 #262D34, stop: 1 #222529);
                                      border-width:0px;border-color:#666666;border-style:none;color:white;}
                                      QScrollBar:vertical{background-color:rgb(94,98,102);
@@ -1749,7 +1749,10 @@ class MainWidget(QMainWindow):
             configFile.close()
 
     def slotAbout(self):
-        webbrowser.open("http://docs.dfrobot.com.cn/upycraft",0,True)
+        if self.preferencesDialog.landlocation.locationComboBox.currentText()=="China Mainland":
+            webbrowser.open("http://docs.dfrobot.com.cn/upycraft",0,True)
+        else:
+            webbrowser.open("http://docs.dfrobot.com/upycraft",0,True)
 
     def slotTerminalCursorChanged(self):
         if self.terminal.terminalSelect:
