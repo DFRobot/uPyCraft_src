@@ -149,7 +149,9 @@ class MainWidget(QMainWindow):
         self.createToolBars()
 
 #create graphics interface
-        self.createGraphicsInterface()  
+        self.createGraphicsInterface() 
+#create Preferences
+        self.preferencesDialog=Preferences()
 
 #thread
         
@@ -1683,7 +1685,7 @@ class MainWidget(QMainWindow):
 
         jsonDict=eval(configText)
 
-        self.preferencesDialog=Preferences()
+        #self.preferencesDialog=Preferences()
         if jsonDict['address']=="China Mainland":
             self.preferencesDialog.landlocation.locationComboBox.setCurrentIndex(0)
         else:

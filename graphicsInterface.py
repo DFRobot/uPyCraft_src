@@ -220,7 +220,7 @@ class LanLocWidget(QWidget):
         locationLabel=QLabel(self.tr("Location"))
         self.locationComboBox=QComboBox()
         self.locationComboBox.addItems(['China Mainland','Others'])
-        self.locationComboBox.setCurrentIndex(1)
+        self.locationComboBox.setCurrentIndex(0)
 
         self.detailWidget=QWidget()
         detailLayout=QGridLayout(self.detailWidget)
