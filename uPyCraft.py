@@ -352,7 +352,7 @@ class MainWidget(QMainWindow):
         self.connect(self.fileOpenAction,SIGNAL("triggered()"),self.slotOpenFile)
 
         self.fileOpenToolsAction=QAction(QIcon(":/fileOpen.png"),self.tr("Open"),self) 
-        self.fileOpenToolsAction.setShortcut("Ctrl+O")  
+        #self.fileOpenToolsAction.setShortcut("Ctrl+O")  
         self.fileOpenToolsAction.setStatusTip(self.tr("open a new file"))  
         self.connect(self.fileOpenToolsAction,SIGNAL("triggered()"),self.slotOpenFile)
 
@@ -363,7 +363,7 @@ class MainWidget(QMainWindow):
         self.connect(self.fileNewAction,SIGNAL("triggered()"),self.slotNewFile)
 
         self.fileNewToolsAction=QAction(QIcon(":/newFile.png"),self.tr("New"),self)
-        self.fileNewToolsAction.setShortcut("Ctrl+N")  
+        #self.fileNewToolsAction.setShortcut("Ctrl+N")  
         self.fileNewToolsAction.setStatusTip(self.tr("create a new file"))  
         self.connect(self.fileNewToolsAction,SIGNAL("triggered()"),self.slotNewFile)
 
@@ -374,7 +374,7 @@ class MainWidget(QMainWindow):
         self.connect(self.fileSaveAction,SIGNAL("triggered()"),self.slotSaveFile)
 
         self.fileSaveToolsAction=QAction(QIcon(":/save.png"),self.tr("Save"),self)  
-        self.fileSaveToolsAction.setShortcut("Ctrl+S")  
+        #self.fileSaveToolsAction.setShortcut("Ctrl+S")  #must delete,else ctrl+s not work
         self.fileSaveToolsAction.setStatusTip(self.tr("save the file"))  
         self.connect(self.fileSaveToolsAction,SIGNAL("triggered()"),self.slotSaveFile)
 
@@ -437,7 +437,7 @@ class MainWidget(QMainWindow):
         self.connect(self.undoAction,SIGNAL("triggered()"),self.slotUndo)
 
         self.undoToolsAction=QAction(QIcon(":/undo.png"),self.tr("Undo"),self)
-        self.undoToolsAction.setShortcut("Ctrl+Z")  
+        #self.undoToolsAction.setShortcut("Ctrl+Z")  
         self.connect(self.undoToolsAction,SIGNAL("triggered()"),self.slotUndo)
 
         #self.redoAction=QAction(QIcon(":/redo.png"),self.tr("Redo"),self)
@@ -446,7 +446,7 @@ class MainWidget(QMainWindow):
         self.connect(self.redoAction,SIGNAL("triggered()"),self.slotRedo)
 
         self.redoToolsAction=QAction(QIcon(":/redo.png"),self.tr("Redo"),self)
-        self.redoToolsAction.setShortcut("Ctrl+Y")  
+        #self.redoToolsAction.setShortcut("Ctrl+Y")  
         self.connect(self.redoToolsAction,SIGNAL("triggered()"),self.slotRedo)
 
         #self.syntaxCheckAction=QAction(QIcon(":/syntaxCheck.png"),self.tr("syntaxCheck"),self)
@@ -559,7 +559,7 @@ class MainWidget(QMainWindow):
         self.connect(self.downloadAndRunAction,SIGNAL("triggered()"),self.slotDownloadFileAndRun)
 
         self.downloadAndRunToolsAction=QAction(QIcon(":/downloadAndRun.png"),self.tr("DownloadAndRun"),self) 
-        self.downloadAndRunToolsAction.setShortcut("F5") 
+        #self.downloadAndRunToolsAction.setShortcut("F5") 
         self.downloadAndRunToolsAction.setStatusTip(self.tr("download file and run"))
         self.connect(self.downloadAndRunToolsAction,SIGNAL("triggered()"),self.slotDownloadFileAndRun)
         self.isDownloadFileAndRun=False

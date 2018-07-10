@@ -88,9 +88,6 @@ class readWriteUart(QThread):
                             break
                 
                 if self.model=="" or self.model=="uitouart":
-                    #self.emit(SIGNAL("uiRecvFromUart"),"1")
-                    #time.sleep(0.1)
-                    #continue
                     try:
                         data=self.ui.myserial.ser.read(1)
                     except Exception as e:
@@ -101,7 +98,6 @@ class readWriteUart(QThread):
                         pass
                     else:
                         data=data.decode()
-
                     if self.lastmodel=="exec_":
                         execSendData+=str(data)
                         if execSendData.find(">")<0:
@@ -111,8 +107,9 @@ class readWriteUart(QThread):
                             self.lastmodel=""
                     
                     self.emit(SIGNAL("uiRecvFromUart"),data)
-                    if self.ui.myserial.ser.inWaiting()>=128:
-                        self.ui.myserial.ser.flushInput()
+                    
+                    #if self.ui.myserial.ser.inWaiting()>=128:
+                    #    self.ui.myserial.ser.flushInput()
                 elif self.model=="exec_":
                     try:
                         data=self.ui.myserial.ser.read(1)
