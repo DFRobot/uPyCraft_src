@@ -42,7 +42,7 @@ from microbit_api               import MICROPYTHON_APIS
 from SourceCodePro import SourceCodePro
 
 mainShow=True
-nowIDEVersion      ="1.0"
+nowIDEVersion      ="1.1"
 isCheckFirmware    =False
 rootDirectoryPath  =os.path.expanduser("~")
 rootDirectoryPath  =rootDirectoryPath.replace("\\","/")
@@ -214,14 +214,17 @@ class MainWidget(QMainWindow):
                                     QMessageBox.Ok)  
             if checkfont==QMessageBox.Ok:
                 ttf=binascii.unhexlify(SourceCodePro)
-                fp=open(rootDirectoryPath+'/Desktop/'+'SourceCodePro.ttf','wb')
-                fp.write(ttf)
-                fp.close()
-                if sys.platform.startswith('win32') or sys.platform.startswith('cygwin'):
-                    os.system('SourceCodePro.ttf')
-                elif sys.platform.startswith('darwin'):
-                    subprocess.call(['open',rootDirectoryPath+'/Desktop/'+'SourceCodePro.ttf'])
-                #os.remove("SourceCodePro.ttf")
+                try:
+                    fp=open(rootDirectoryPath+'/Desktop/'+'SourceCodePro.ttf','wb')
+                    fp.write(ttf)
+                    fp.close()
+                    if sys.platform.startswith('win32') or sys.platform.startswith('cygwin'):
+                        os.system('SourceCodePro.ttf')
+                    elif sys.platform.startswith('darwin'):
+                        subprocess.call(['open',rootDirectoryPath+'/Desktop/'+'SourceCodePro.ttf'])
+                    #os.remove("SourceCodePro.ttf")
+                except:
+                    print("install ttf false.")
 						  
         font=QFont(self.tr("Source Code Pro"),10)
         QApplication.setFont(font)
@@ -404,6 +407,10 @@ class MainWidget(QMainWindow):
             self.boardPyboard()
         elif self.currentBoard=="microbit":
             self.boardMicrobit()
+        elif self.currentBoard=="TPYBoardV202":
+            self.boardTPYBoardV202()
+        elif self.currentBoard=="TPYBoardV102":
+            self.boardTPYBoardV102()
         else:
             self.boardOther()
 
@@ -521,14 +528,25 @@ class MainWidget(QMainWindow):
         self.connect(self.microbit,SIGNAL("triggered()"),self.boardMicrobit)
         self.microbit.setCheckable(True)
 
+        self.TPYBoardV202=QAction(self.tr("TPYBoardV202"),self)
+        self.connect(self.TPYBoardV202,SIGNAL("triggered()"),self.boardTPYBoardV202)
+        self.TPYBoardV202.setCheckable(True)
+
+        self.TPYBoardV102=QAction(self.tr("TPYBoardV102"),self)
+        self.connect(self.TPYBoardV102,SIGNAL("triggered()"),self.boardTPYBoardV102)
+        self.TPYBoardV102.setCheckable(True)
+
+
         self.otherBoard=QAction(self.tr("other"),self)
         self.connect(self.otherBoard,SIGNAL("triggered()"),self.boardOther)
         self.otherBoard.setCheckable(True)
 
         self.boardActionGroup=QActionGroup(self)
         self.boardActionGroup.addAction(self.esp8266)
+        self.boardActionGroup.addAction(self.TPYBoardV202)
         self.boardActionGroup.addAction(self.esp32)
         self.boardActionGroup.addAction(self.pyboard)
+        self.boardActionGroup.addAction(self.TPYBoardV102)
         self.boardActionGroup.addAction(self.microbit)
         self.boardActionGroup.addAction(self.otherBoard)
         self.boardActionGroup.setExclusive(True)
@@ -536,8 +554,10 @@ class MainWidget(QMainWindow):
         self.boardMenu = QMenu(self.tr("board"))
         
         self.boardMenu.addAction(self.esp8266)
+        self.boardMenu.addAction(self.TPYBoardV202)
         self.boardMenu.addAction(self.esp32)
         self.boardMenu.addAction(self.pyboard)
+        self.boardMenu.addAction(self.TPYBoardV102)
         self.boardMenu.addAction(self.microbit)
         self.boardMenu.addAction(self.otherBoard)
         #self.boardMenuTools=QAction(QIcon(":/board.png"),self.tr("board"),self)
@@ -714,6 +734,27 @@ class MainWidget(QMainWindow):
                     newMenu = self.exampleMenu.addMenu(adirList[1])
                     self.addPCcommonExamples(adir[1:],newMenu,adir[1:])
                     menuTitle.append(adirList[1])
+        elif self.currentBoard=="TPYBoardV202":
+            self.getPCboardExamples("%s/AppData/Local/uPyCraft/examples/Boards/TPYBoardV202"%rootDirectoryPath)
+            for filename in self.PCboardList:
+                if filename in self.PCcommonList:
+                    self.PCcommonList.remove(filename)
+            self.getPCexamples("%s/AppData/Local/uPyCraft/examples/Boards/TPYBoardV202"%rootDirectoryPath,self.exampleMenu)
+            menuTitle=[]
+            for i in self.exampleMenu.findChildren(QMenu):
+                menuTitle.append(i.title())
+            for adir in self.PCcommonList:
+                adirList = adir.split("/")
+                if adirList[1] in menuTitle:
+                    for i in self.exampleMenu.findChildren(QMenu):
+                        if i.title()==adirList[1]:
+                            self.addPCcommonExamples(adir[1:],i,adir[1:])
+                            break
+                else:
+                    newMenu = self.exampleMenu.addMenu(adirList[1])
+                    self.addPCcommonExamples(adir[1:],newMenu,adir[1:])
+                    menuTitle.append(adirList[1])
+            
         elif self.currentBoard=="pyboard":
             self.getPCboardExamples("%s/AppData/Local/uPyCraft/examples/Boards/pyboard"%rootDirectoryPath)
             for filename in self.PCboardList:
@@ -734,6 +775,27 @@ class MainWidget(QMainWindow):
                     newMenu = self.exampleMenu.addMenu(adirList[1])
                     self.addPCcommonExamples(adir[1:],newMenu,adir[1:])
                     menuTitle.append(adirList[1])
+        elif self.currentBoard=="TPYBoardV102":
+            self.getPCboardExamples("%s/AppData/Local/uPyCraft/examples/Boards/TPYBoardV102"%rootDirectoryPath)
+            for filename in self.PCboardList:
+                if filename in self.PCcommonList:
+                    self.PCcommonList.remove(filename)
+            self.getPCexamples("%s/AppData/Local/uPyCraft/examples/Boards/TPYBoardV102"%rootDirectoryPath,self.exampleMenu)
+            menuTitle=[]
+            for i in self.exampleMenu.findChildren(QMenu):
+                menuTitle.append(i.title())
+            for adir in self.PCcommonList:
+                adirList = adir.split("/")
+                if adirList[1] in menuTitle:
+                    for i in self.exampleMenu.findChildren(QMenu):
+                        if i.title()==adirList[1]:
+                            self.addPCcommonExamples(adir[1:],i,adir[1:])
+                            break
+                else:
+                    newMenu = self.exampleMenu.addMenu(adirList[1])
+                    self.addPCcommonExamples(adir[1:],newMenu,adir[1:])
+                    menuTitle.append(adirList[1])
+            
         elif self.currentBoard=="microbit":
             self.getPCboardExamples("%s/AppData/Local/uPyCraft/examples/Boards/microbit"%rootDirectoryPath)
             for filename in self.PCboardList:
@@ -965,6 +1027,32 @@ class MainWidget(QMainWindow):
             return
         filename=QFileDialog.getSaveFileName(self)
         print(filename)
+        if filename=="":
+            return
+        splitFilename=filename.split("/")[-1]
+        if (str(splitFilename).endswith(".py")==True and len(splitFilename)>3) or\
+           (str(splitFilename).endswith(".txt")==True and len(splitFilename)>4) or\
+           (str(splitFilename).endswith(".json")==True and len(splitFilename)>5) or\
+           (str(splitFilename).endswith(".ini")==True and len(splitFilename)>4):
+            pass
+        elif str(splitFilename).find(".")<0:
+            filename=filename+'.py'
+        elif str(splitFilename)[-1]==".":
+            if(splitFilename[0]) == ".":
+                QMessageBox.information(self,self.tr("waring"),self.tr("error file name!"),QMessageBox.Ok)
+                return
+            else:
+                filename=filename+"py"
+        elif str(splitFilename).find(".")==0:
+            QMessageBox.information(self,self.tr("waring"),self.tr("error file name!"),QMessageBox.Ok)
+            return
+        elif str(splitFilename).find(".")>0 and str(splitFilename)[-1]!=".":
+            filename=filename+'.py'
+        else:
+            filename=str(filename)
+            if splitFilename[-3:].lower()==".py":
+                filename=filename[0:-3]+".py"
+        
         if filename:
             self.saveStr=self.tabWidget.currentWidget().text()
             savefile=open(filename,'wb')
@@ -1363,7 +1451,12 @@ class MainWidget(QMainWindow):
                 self.terminal.append("connect serial timeout")
                 return
 
-        self.currentBoard=startdata.split("\r\n")[1][1:-1]
+        #self.currentBoard=startdata.split("\r\n")[1][1:-1]
+        currentBoard2=startdata.split("\r\n")[1][1:-1]
+        if self.currentBoard=="TPYBoardV202" and currentBoard2=="esp8266":
+            self.currentBoard="TPYBoardV202"
+        else:
+            self.currentBoard=currentBoard2
         
         self.ctrl.start()
         time.sleep(0.005)
@@ -1374,10 +1467,10 @@ class MainWidget(QMainWindow):
         self.uitoctrlQueue.put("importOs")
         time.sleep(0.05)
 
-        if self.currentBoard=="pyboard":
-            self.boardPyboard()
-        else:
-            self.uitoctrlQueue.put("checkFirmware")
+        #if self.currentBoard=="pyboard":
+        #    self.boardPyboard()
+        #else:
+        self.uitoctrlQueue.put("checkFirmware")
 
         if self.currentBoard=="microbit":
             self.boardMicrobit()
@@ -1483,7 +1576,12 @@ class MainWidget(QMainWindow):
                 self.terminal.append("connect serial timeout")
                 return
 
-        self.currentBoard=startdata.split("\r\n")[1][1:-1]
+        #self.currentBoard=startdata.split("\r\n")[1][1:-1]
+        currentBoard2=startdata.split("\r\n")[1][1:-1]
+        if self.currentBoard=="TPYBoardV202" and currentBoard2=="esp8266":
+            self.currentBoard="TPYBoardV202"
+        else:
+            self.currentBoard=currentBoard2
         
         self.ctrl.start()
         time.sleep(0.005)
@@ -1494,10 +1592,10 @@ class MainWidget(QMainWindow):
         self.uitoctrlQueue.put("importOs")
         time.sleep(0.05)
 
-        if self.currentBoard=="pyboard":
-            self.boardPyboard()
-        else:
-            self.uitoctrlQueue.put("checkFirmware")
+        #if self.currentBoard=="pyboard":
+        #    self.boardPyboard()
+        #else:
+        self.uitoctrlQueue.put("checkFirmware")
 
         if self.currentBoard=="microbit":
             self.boardMicrobit()
@@ -1861,6 +1959,28 @@ class MainWidget(QMainWindow):
 
         self.createExampleMenu()
 
+    def boardTPYBoardV202(self):
+        self.currentBoard="TPYBoardV202"
+        self.emit(SIGNAL("changeCurrentBoard"),self.currentBoard)
+        time.sleep(0.005)
+        self.autoAPI.clear()
+        self.autoAPI.prepare()
+        self.exampleTools.setMenu(None)
+        self.exampleMenu.clear()
+
+        self.createExampleMenu()
+
+    def boardTPYBoardV102(self):
+        self.currentBoard="TPYBoardV102"
+        self.emit(SIGNAL("changeCurrentBoard"),self.currentBoard)
+        time.sleep(0.005)
+        self.autoAPI.clear()
+        self.autoAPI.prepare()
+        self.exampleTools.setMenu(None)
+        self.exampleMenu.clear()
+
+        self.createExampleMenu()
+
     def boardEsp8266(self):
         self.currentBoard="esp8266"
         self.emit(SIGNAL("changeCurrentBoard"),self.currentBoard)
@@ -1942,7 +2062,9 @@ class MainWidget(QMainWindow):
                         if filename[boardNum]=="ESP32" or \
                            filename[boardNum]=="ESP8266" or \
                            filename[boardNum]=="pyboard" or \
-                           filename[boardNum]=="microbit":
+                           filename[boardNum]=="microbit" or \
+                           filename[boardNum]=="TPYBoardV202" or \
+                           filename[boardNum]=="TPYBoardV102":
                             break
                         else:
                             appendFilename="/"+filename[boardNum]+appendFilename
@@ -2213,12 +2335,12 @@ class MainWidget(QMainWindow):
             self.newBoardDirName.show()
 
     def updateFirmware(self,isAuto=False):
-        if self.currentBoard=="pyboard":
-            self.terminal.append("You chose pyboard,you should reconnect to serial or hardware burnt by yourself!")
+        if self.currentBoard=="pyboard" or self.currentBoard=="TPYBoardV102":
+            self.terminal.append("You choose %s,you should reconnect to serial or hardware burnt by yourself!"%self.currentBoard)
             self.canNotIdentifyBoard=False
             return
         elif self.currentBoard=="other":
-            self.bottomText.append("You chose other board,you should reconnect to serial or hardware burnt by yourself!")
+            self.bottomText.append("You choose other board,you should reconnect to serial or hardware burnt by yourself!")
             self.canNotIdentifyBoard=False
             return
 
@@ -2297,6 +2419,9 @@ class MainWidget(QMainWindow):
             if self.updateBin.firmwareName.text()!="":
                 userFirmwareName=self.updateBin.firmwareName.text()
                 userFirmwareName=userFirmwareName.replace("\\","/")
+                print("++++++++++++++++")
+                print(userFirmwareName)
+                print("++++++++++++++++")
                 if not os.path.exists(userFirmwareName):
                     self.terminal.append("user choosed firmware file is not exists!")
                     return
@@ -2578,13 +2703,18 @@ class MainWidget(QMainWindow):
         msg=msg[1][1:-1]
         msg=msg.split(",")
         board=msg[0][9:-1]
-        
-        if board=="esp32":
+        if self.currentBoard=="TPYBoardV202" and board=="esp8266":
+            self.boardTPYBoardV202()
+            return
+        elif board=="esp32":
             self.boardEsp32()
         elif board=="esp8266":
             self.boardEsp8266()
         elif board=="pyboard":
             self.boardPyboard()
+            return
+        elif board=="TPYBoard":
+            self.boardTPYBoardV102()
             return
         elif board=="microbit":
             self.boardMicrobit()

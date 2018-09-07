@@ -62,13 +62,13 @@ class threadUserFirmware(QThread):
         if self.iserase=="yes":
             self.emit(SIGNAL("firmwareAnyErase"),100)
         try:
-            if self.board=="esp32" or self.board=="esp8266":
+            if self.board=="esp32" or self.board=="esp8266" or self.board=="TPYBoardV202":
                 Esp.Burn(esptool,str(self.board),self.savepath,self.com,False,self.burnaddr)
             else:#microbit
                 print("In threaddownloadfirmware:savepath=%s"%self.savepath)
                 self.emit(SIGNAL("firmwareAnyUpdate"),-2)
                 time.sleep(0.5)
-                self.emit(SIGNAL("goMicrobitUpdate")) 
+                self.emit(SIGNAL("goMicrobitUpdate"))
         except:
             self.emit(SIGNAL("firmwareAnyUpdate"),-1)
             self.exit()
@@ -166,7 +166,7 @@ class threadDownloadFirmware(QThread):
             if self.iserase=="yes":
                 self.emit(SIGNAL("firmwareAnyErase"),100)
             try:
-                if self.board=="esp32" or self.board=="esp8266":
+                if self.board=="esp32" or self.board=="esp8266" or self.board=="TPYBoardV202":
                     Esp.Burn(esptool,str(self.board),self.savepath,self.com,False,self.burnaddr)
                 else:#microbit
                     print("In threaddownloadfirmware:savepath=%s"%self.savepath)
@@ -177,7 +177,7 @@ class threadDownloadFirmware(QThread):
                 self.emit(SIGNAL("firmwareAnyUpdate"),-1)
                 self.exit()
                 return
-            if self.board=="esp8266":
+            if self.board=="esp8266" or self.board=="TPYBoardV202":
                 Esp.downOkReset()
 
         self.exit()

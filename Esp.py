@@ -783,8 +783,10 @@ class ESPLoader(object):
 
     def hard_reset(self):
         self._port.setRTS(True)  # EN->LOW
+        self._port.setDTR(self._port.dtr)
         time.sleep(0.1)
         self._port.setRTS(False)
+        self._port.setDTR(self._port.dtr)
 
     def soft_reset(self, stay_in_bootloader):
         if not self.IS_STUB:
@@ -1674,7 +1676,6 @@ def write_flash(esp, args):
     # -> otherwise, set --compress unless --no-stub is set
     if args.compress is None and not args.no_compress:
         args.compress = not args.no_stub
-
     # verify file sizes fit in flash
     flash_end = flash_size_bytes(args.flash_size)
     for address, argfile in args.addr_filename:
@@ -1686,9 +1687,6 @@ def write_flash(esp, args):
         argfile.seek(0)
 
     for address, argfile in args.addr_filename:
-        print("=============for  addr ======================")
-        #print(address)
-        #print(argfile)
         if args.no_stub:
             print('Erasing flash...')
         image = pad_to(argfile.read(), 4)
@@ -1747,6 +1745,7 @@ def write_flash(esp, args):
         esp._port.timeout = DEFAULT_TIMEOUT
 
     print('\nLeaving...')
+
 
     if esp.IS_STUB:
         # skip sending flash_finish to ROM loader here,
@@ -1934,7 +1933,7 @@ def version(args):
 class  Args:
   addr_filename=[]
   after='hard_reset'
-  baud=460800
+  baud=115200
   before='default_reset'
   chip='esp32'
   compress=True
@@ -1951,12 +1950,17 @@ class  Args:
 
 def downOkReset():
     global updateOkReset
-    updateOkReset._port.rtscts=True
-    updateOkReset._port.setRTS(False)
-    updateOkReset._port.setRTS(True)
+    ##updateOkReset._port.rtscts=True
+    #updateOkReset._port.setRTS(True)
+    #time.sleep(0.1)
+    #updateOkReset._port.setRTS(False)
+    #updateOkReset._port.close()
+    updateOkReset.hard_reset()
     updateOkReset._port.close()
     
 def espCloseReset(port,board):
+    if board=="TPYBoardV202":
+      board="esp8266"
     args=Args()
     args.chip=board
     initial_baud = min(ESPLoader.ESP_ROM_BAUD, args.baud)
@@ -1966,14 +1970,18 @@ def espCloseReset(port,board):
     }[args.chip]
     esp = chip_class(port, initial_baud)
     esp.connect(args.before)
-    esp._port.rtscts=True
-    esp._port.setRTS(False)
-    esp._port.setRTS(True)
+    #esp._port.rtscts=True
+    #esp._port.setRTS(True)
+    #time.sleep(0.1)
+    #esp._port.setRTS(False)
+    esp.hard_reset()
     esp._port.close()
     
 
 def Burn(obj,board,filename,port,erase=False,writeFlashAddr=0):
     args=Args()
+    if board=="TPYBoardV202":
+      board="esp8266"
     if board=='esp32':
       args.chip='esp32'
     elif board == 'esp8266':
@@ -1982,6 +1990,8 @@ def Burn(obj,board,filename,port,erase=False,writeFlashAddr=0):
     esptool = obj
     print('---------------------%s'%filename)
     if not erase:      
+      for i in range(0,len(args.addr_filename)):
+        args.addr_filename.pop()
       fp=open(filename,'rb')
       args.addr_filename.append((writeFlashAddr,fp))
       args.port=port
@@ -2054,16 +2064,32 @@ def Burn(obj,board,filename,port,erase=False,writeFlashAddr=0):
             if esp.IS_STUB:
                 esp.soft_reset(True)  # exit stub back to ROM loader
                 
-        esp._port.rtscts=True
-        esp._port.setRTS(False)
-        esp._port.setRTS(True)
+        #esp._port.rtscts=True
+        #esp._port.setRTS(False)
+        ##time.sleep(0.1)
+        #esp._port.setRTS(True)
+        ##time.sleep(0.1)
+        #esp._port.setRTS(False)
+        #esp._port.close()
+
+        #esp._port.rtscts=False
+        #esp._port.setRTS(True)
+        #esp._port.setRTS(False)
+        #esp._port.setRTS(True)
+        #esp.hard_reset()
         esp._port.close()
         
         global updateOkReset
         updateOkReset=esp
         if not erase:
-          args.addr_filename.pop()
-          fp.close()
+            try:
+                args.addr_filename.pop()
+                fp.close()
+                print(args.addr_filename)
+            except Exception as e:
+                print("ndm-----------------2-")
+                print(e)
+                print("ndm-----------------1-")
     else:
         operation_func(args)
 
