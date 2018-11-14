@@ -3,9 +3,11 @@ import os
 import shutil
 import time
 
-from PyQt4.QtGui import *  
-from PyQt4.QtCore import *
-from PyQt4.Qsci import QsciScintilla, QsciScintillaBase, QsciLexerPython
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.Qsci import QsciScintilla, QsciScintillaBase, QsciLexerPython
+from PyQt5.QtWidgets import *
+
 
 
 rootDirectoryPath  =os.path.expanduser("~")
@@ -13,6 +15,7 @@ rootDirectoryPath  =rootDirectoryPath.replace("\\","/")
 currentExamplesPath="%s/AppData/Local/uPyCraft/examples"%rootDirectoryPath
 
 class myTerminal(QTextEdit):
+    customContextMenuRequestedSig = pyqtSignal(QPoint)
     def __init__(self,queue,parent):        
         super(myTerminal,self).__init__(parent)
         self.eventFilterEnable=False
@@ -49,9 +52,9 @@ class myTerminal(QTextEdit):
         self.ui=parent
         self.queue=queue
         self.currentBoard="esp32"
-        self.connect(self.ui,SIGNAL("changeCurrentBoard"),self.changeBoard)
-        self.connect(self.ui,SIGNAL("initRecvdata"),self.initRecvdata)
-        self.connect(self.ui,SIGNAL("initMessycode"),self.initMessycode)
+        self.ui.changeCurrentBoard.connect(self.changeBoard)
+        self.ui.initRecvdata.connect(self.initRecvdata)
+        self.ui.initMessycode.connect(self.initMessycode)
 
         self.keyPressMsg=""
         self.recvdata=""
@@ -65,7 +68,7 @@ class myTerminal(QTextEdit):
         
     def createTerminalRightMenu(self):
         self.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.connect(self,SIGNAL("customContextMenuRequested(const QPoint&)"),self.slotTerminalRightClickMenu)
+        self.customContextMenuRequestedSig.connect(self.slotTerminalRightClickMenu)
         self.terminalRightMenu=QMenu(self)
         self.terminalRightMenu.setStyleSheet(
                 """QMenu{background-color:rgb(67,67,67);
@@ -75,10 +78,10 @@ class myTerminal(QTextEdit):
             )
 
         terminalCopy=QAction(QIcon(":/copy.png"),self.tr("copy"),self)
-        self.connect(terminalCopy,SIGNAL("triggered()"),self.slotCopy)
+        terminalCopy.triggered.connect(self.slotCopy)
         
         terminalPaste=QAction(QIcon(":/copy.png"),self.tr("paste"),self)
-        self.connect(terminalPaste,SIGNAL("triggered()"),self.slotPaste)
+        terminalPaste.triggered.connect(self.slotPaste)
 
         self.terminalRightMenu.addAction(terminalCopy)
         self.terminalRightMenu.addAction(terminalPaste)
@@ -453,7 +456,7 @@ class myTerminal(QTextEdit):
             self.startCursorPosition =event.pos()
             self.cursor = self.cursorForPosition(self.startCursorPosition)
             self.startPosition = self.cursor.position()
-            self.emit(SIGNAL("setCursor"))
+            self.setCursor.emit()
             
     def mouseMoveEvent(self,event):
         if event.button()==Qt.NoButton:
@@ -473,6 +476,7 @@ class myTerminal(QTextEdit):
         
     
 class myTreeView(QTreeView):
+    customContextMenuRequestedSig = pyqtSignal(QPoint)
     def __init__(self,parent):
         super(myTreeView,self).__init__(parent)
         self.ui=parent
@@ -507,7 +511,9 @@ class myTreeView(QTreeView):
         self.dragFrom=""
         self.dropDir=""
         #self.connect(self,SIGNAL("clicked(QModelIndex)"),self.chooseFile)
-        self.connect(self,SIGNAL("pressed(QModelIndex)"),self.treepressed)
+
+        # self.connect(self,SIGNAL("pressed(QModelIndex)"),self.treepressed)
+        self.pressed.connect(self.treepressed)
 
     def setmodel(self,model):
         self.setModel(model)
@@ -524,25 +530,25 @@ class myTreeView(QTreeView):
         self.setContextMenuPolicy(Qt.CustomContextMenu)
 
         self.runFile=QAction(self.tr("Run"),self)
-        self.connect(self.runFile,SIGNAL("triggered()"),self.rightMenuRunFile)
-        
+        self.runFile.triggered.connect(self.rightMenuRunFile)
+
         self.openFile=QAction(self.tr("Open"),self) 
-        self.connect(self.openFile,SIGNAL("triggered()"),self.rightMenuOpenFile)
+        self.openFile.triggered.connect(self.rightMenuOpenFile)
 
         self.closeFile=QAction(self.tr("Close"),self)
-        self.connect(self.closeFile,SIGNAL("triggered()"),self.rightMenuCloseFile)
-        
-        self.deleteFile=QAction(self.tr("Delete"),self) 
-        self.connect(self.deleteFile,SIGNAL("triggered()"),self.rightMenuDeleteFile)
+        self.closeFile.triggered.connect(self.rightMenuCloseFile)
+
+        self.deleteFile=QAction(self.tr("Delete"),self)
+        self.deleteFile.triggered.connect(self.rightMenuDeleteFile)
 
         self.defaultProgram=QAction(self.tr("Default Run"),self)
-        self.connect(self.defaultProgram,SIGNAL("triggered()"),self.rightMenuDefaultProgram)
+        self.defaultProgram.triggered.connect(self.rightMenuDefaultProgram)
 
         self.rename=QAction(self.tr("Rename"),self)
-        self.connect(self.rename,SIGNAL("triggered()"),self.rightMenuRename)
+        self.rename.triggered.connect(self.rightMenuRename)
 
         self.newDir=QAction(self.tr("New Dir"),self)
-        self.connect(self.newDir,SIGNAL("triggered()"),self.rightMenuNewDir)
+        self.newDir.triggered.connect(self.rightMenuNewDir)
 
         self.rightClickMenu=QMenu(self)
         self.rightClickMenu.setStyleSheet(
@@ -559,7 +565,7 @@ class myTreeView(QTreeView):
         self.rightClickMenu.addAction(self.rename)
         self.rightClickMenu.addAction(self.newDir)
 
-        self.connect(self,SIGNAL("customContextMenuRequested(const QPoint&)"),self.slotRightClickMenu)
+        self.customContextMenuRequestedSig.connect(self.slotRightClickMenu)
 
     def slotRightClickMenu(self,point):
         self.rightClickMenu.clear()
@@ -715,7 +721,7 @@ class myTreeView(QTreeView):
                 if not self.ui.myserial.ser.isOpen():
                     self.ui.terminal.append("serial not open,can not download file")
                     return
-                self.ui.emit(SIGNAL("changeDragDropModel"),True)
+                self.ui.changeDragDropModel.emit(True)
                 self.ui.uitoctrlQueue.put("dropdownfile:::%s:::%s"%(filename,dropDownFileName))
                 print("filename=%s"%filename)
                 print("dropDownFileName=%s"%dropDownFileName)
@@ -785,7 +791,7 @@ class myTreeView(QTreeView):
                     else:
                         newDropFileName=newDropFileName[7:str(newDropFileName).find(dirListDrop[-1])-1]
                         newDropFileName=self.ui.rootDir+newDropFileName
-                    self.ui.emit(SIGNAL("changeDragDropModel"),True)
+                    self.ui.changeDragDropModel.emit(True)
                     self.ui.uitoctrlQueue.put("dragChangeDir:::%s:::%s"%(oldDragFileName,newDropFileName))
                 else:
                     pass
@@ -813,8 +819,8 @@ class myTabWidget(QTabWidget):
         self.line=0
         self.index=0
 
-        self.connect(self, SIGNAL("tabCloseRequested(int)"),self.closeTab)
-        self.connect(self, SIGNAL("currentChanged(int)"),self.currentTabChange)
+        self.tabCloseRequested.connect(self.closeTab)
+        self.currentChanged.connect(self.currentTabChange)
 
     def closeTab(self,tabId):
         if tabId<0:
@@ -920,7 +926,7 @@ class myTabWidget(QTabWidget):
         editor.setText(msg)
 
         editor.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.connect(editor,SIGNAL("customContextMenuRequested(const QPoint&)"),self.slotEditorRightClickMenu)
+        editor.customContextMenuRequested.connect(self.slotEditorRightClickMenu)
 
         if self.editorRightMenu==None:
             self.editorRightMenu=QMenu(self)
@@ -933,23 +939,23 @@ class myTabWidget(QTabWidget):
             
             undo=QAction(self.tr("Undo"),self)
             undo.setShortcut("Ctrl+Z")
-            self.connect(undo,SIGNAL("triggered()"),self.slotUndo)
+            undo.triggered.connect(self.slotUndo)
 
             redo=QAction(self.tr("Redo"),self)
             redo.setShortcut("Ctrl+Y")
-            self.connect(redo,SIGNAL("triggered()"),self.slotRedo)
+            redo.triggered.connect(self.slotRedo)
 
             cut=QAction(self.tr("Cut"),self)
             cut.setShortcut("Ctrl+X")
-            self.connect(cut,SIGNAL("triggered()"),self.slotCut)
+            cut.triggered.connect(self.slotCut)
 
             copy=QAction(self.tr("Copy"),self)
             copy.setShortcut("Ctrl+C")
-            self.connect(copy,SIGNAL("triggered()"),self.slotCopy)
+            copy.triggered.connect(self.slotCopy)
 
             paste=QAction(self.tr("Paste"),self)
             paste.setShortcut("Ctrl+V")
-            self.connect(paste,SIGNAL("triggered()"),self.slotPaste)            
+            paste.triggered.connect(self.slotPaste)
 
             self.editorRightMenu.addAction(undo)
             self.editorRightMenu.addAction(redo)
@@ -1001,13 +1007,13 @@ class myTabWidget(QTabWidget):
             self.fileitem.list.append(filename)
 
 
-        self.connect(editor,SIGNAL("dragOpenFile"),self.dragOpenFile)
+        editor.dragOpenFile.connect(self.dragOpenFile)
 
-        self.connect(editor,SIGNAL("textChanged()"),self.editorTextChange)
-        self.connect(editor,SIGNAL("selectionChanged()"),self.selectionChanged)
-        self.connect(editor,SIGNAL("linesChanged()"),self.linesChanged)
-        self.connect(editor,SIGNAL("cursorPositionChanged(int,int)"),self.cursorPositionChanged)
-        self.connect(editor,SIGNAL("userListActivated(int,const QString)"),self.userListActivated)
+        editor.textChanged.connect(self.editorTextChange)
+        editor.selectionChanged.connect(self.selectionChanged)
+        editor.linesChanged.connect(self.linesChanged)
+        editor.cursorPositionChanged.connect(self.cursorPositionChanged)
+        editor.userListActivated.connect(self.userListActivated)
         #self.connect(editor,SIGNAL("SCN_AUTOCSELECTION(const char*,int)"),self.scn_updateui)
 
     def slotEditorRightClickMenu(self,point):
@@ -1157,6 +1163,14 @@ class myTabWidget(QTabWidget):
             self.ui.pcOpenFile(filename)
 
 class myQsciScintilla(QsciScintilla):
+    customContextMenuRequested = pyqtSignal()
+    dragOpenFile = pyqtSignal(str)
+    textChanged = pyqtSignal()
+    selectionChanged = pyqtSignal()
+    linesChanged = pyqtSignal()
+    cursorPositionChanged = pyqtSignal(int, int)
+    userListActivated = pyqtSignal(int, str)
+
     def __init__(self,parent=None):
         super(myQsciScintilla,self).__init__(parent)
 
@@ -1175,7 +1189,7 @@ class myQsciScintilla(QsciScintilla):
             dropOpenFileName=""
             for url in urls:
                 dropOpenFileName=url.toLocalFile()
-            self.emit(SIGNAL("dragOpenFile"),dropOpenFileName)
+            self.dragOpenFile.emit(dropOpenFileName)
 
 
 

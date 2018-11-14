@@ -40,15 +40,18 @@ START_FLASH_TIMEOUT = 20  # timeout for starting flash (may perform erase)
 CHIP_ERASE_TIMEOUT = 120  # timeout for full chip erase
 SYNC_TIMEOUT = 0.1        # timeout for syncing with bootloader
 
-from PyQt4.QtGui import *  
-from PyQt4.QtCore import *
+from PyQt5.QtCore import *
+
 class ESPTool(QObject):
+  percentchange = pyqtSignal(int)
+  eraseStartSig = pyqtSignal()
+
   def __init__(self,parent=None):
     super(ESPTool,self).__init__(parent)
   def updatePer(self,per):
-    self.emit(SIGNAL("percentchange"),per)
+    self.percentchange.emit(per)
   def eraseStart(self):
-    self.emit(SIGNAL("eraseStart"))
+    self.eraseStartSig.emit()
 
 esptool=None
 updateOkReset=None   
@@ -2438,6 +2441,7 @@ class SpiConnectionAction(argparse.Action):
             clk,q,d,hd,cs = values
             value = (hd << 24) | (cs << 18) | (d << 12) | (q << 6) | clk
         else:
+            # FIXME
             raise argparse.ArgumentError(self, '%s is not a valid spi-connection value. ' +
                                          'Values are SPI, HSPI, or a sequence of 5 pin numbers CLK,Q,D,HD,CS).' % values)
         setattr(namespace, self.dest, value)
