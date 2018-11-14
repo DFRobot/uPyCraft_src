@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 
 import sys
 import time
 import serial
 import serial.tools.list_ports
 
-if sys.platform=="darwin":
-    pass
-else:
-	QTextCodec.setCodecForTr(QTextCodec.codecForName("utf8"))
+#if sys.platform=="darwin":
+#    pass
+#else:
+#	QTextCodec.setCodecForTr(QTextCodec.codecForName("utf8"))
 
 class findReplaceText(QDialog):
     def __init__(self,parent=None):
@@ -68,8 +69,8 @@ class saveUntitled(QDialog):
         self.saveFileWidget.hide()
         self.setLayout(saveFileLayout)
                                 
-        self.connect(self.okButton,SIGNAL("clicked()"),self.saveFileEditOk)
-        self.connect(self.cancelButton,SIGNAL("clicked()"),self.saveFileEditCancle)
+        self.okButton.clicked.connect(self.saveFileEditOk)
+        self.cancelButton.clicked.connect(self.saveFileEditCancle)
                         
     def saveFileEditOk(self):
         self.close()
@@ -94,8 +95,8 @@ class treeRightClickRename(QDialog):
         self.cancelButton=QPushButton(self.tr("cancel"))
 
 
-        self.connect(self.okButton,SIGNAL("clicked()"),self.renameOk)
-        self.connect(self.cancelButton,SIGNAL("clicked()"),self.renameCancel)
+        self.okButton.clicked.connect(self.renameOk)
+        self.cancelButton.clicked.connect(self.renameCancel)
 
         layout=QGridLayout()
         layout.addWidget(self.nameLabel,0,0)
@@ -135,8 +136,8 @@ class createBoardNewDirName(QDialog):
         self.nameWidget.hide()
         self.setLayout(layout)
 
-        self.connect(self.okButton,SIGNAL("clicked()"),self.nameEditOk)
-        self.connect(self.cancelButton,SIGNAL("clicked()"),self.nameEditCancel)
+        self.okButton.clicked.connect(self.nameEditOk)
+        self.cancelButton.clicked.connect(self.nameEditCancel)
 
     def nameEditOk(self):
         self.close()
@@ -261,9 +262,9 @@ class Preferences(QDialog):
         self.configUpdate=updateConfig()
         
         tabWidget=QTabWidget()
-        tabWidget.setTabPosition(QTabWidget.North);
+        tabWidget.setTabPosition(QTabWidget.North)
         tabWidget.addTab(self.configUpdate,"config")
-        tabWidget.addTab(self.landlocation,"Languare Location")
+        tabWidget.addTab(self.landlocation,"Language Location")
         tabWidget.addTab(SerialWidget(self),"Serial")
         
         layout.addWidget(tabWidget,1,0)
