@@ -151,7 +151,7 @@ class MainWidget(QMainWindow):
 #create graphics interface
         self.createGraphicsInterface() 
 #create Preferences
-        self.preferencesDialog=Preferences()
+        self.preferencesDialog=Preferences(self.myserial)
 
 #thread
         

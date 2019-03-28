@@ -116,7 +116,7 @@ class updateConfig(QWidget):
         self.setLayout(detailLayout)
   
 class Preferences(QDialog):
-    def __init__(self,parent=None):
+    def __init__(self,serialWidget,parent=None):
         super(Preferences,self).__init__(parent)  
         self.widget=QWidget()
         layout=QGridLayout(self.widget)
@@ -126,7 +126,7 @@ class Preferences(QDialog):
         
         tabWidget=QTabWidget()
         tabWidget.setTabPosition(QTabWidget.West);
-        tabWidget.addTab(SerialWidget(self),"Serial")
+        tabWidget.addTab(serialWidget,"Serial")
         tabWidget.addTab(self.landlocation,"Languare Location")
         tabWidget.addTab(self.configUpdate,"config")
         layout.addWidget(tabWidget,1,0)
