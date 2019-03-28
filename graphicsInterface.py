@@ -249,7 +249,7 @@ class updateConfig(QWidget):
         self.setLayout(detailLayout)
   
 class Preferences(QDialog):
-    def __init__(self,parent=None):
+    def __init__(self,serialWidget,parent=None):
         super(Preferences,self).__init__(parent)
         self.setWindowFlags(Qt.WindowCloseButtonHint)#HelpButtonHint?
         self.setStyleSheet("""QDialog{background-color: rgb(236, 236, 236);color:black;}
@@ -264,7 +264,7 @@ class Preferences(QDialog):
         tabWidget.setTabPosition(QTabWidget.North);
         tabWidget.addTab(self.configUpdate,"config")
         tabWidget.addTab(self.landlocation,"Languare Location")
-        tabWidget.addTab(SerialWidget(self),"Serial")
+        tabWidget.addTab(serialWidget,"Serial")
         
         layout.addWidget(tabWidget,1,0)
         self.setLayout(layout)
