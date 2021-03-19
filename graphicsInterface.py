@@ -263,7 +263,7 @@ class Preferences(QDialog):
         tabWidget=QTabWidget()
         tabWidget.setTabPosition(QTabWidget.North);
         tabWidget.addTab(self.configUpdate,"config")
-        tabWidget.addTab(self.landlocation,"Languare Location")
+        tabWidget.addTab(self.landlocation,"Language Location")
         tabWidget.addTab(SerialWidget(self),"Serial")
         
         layout.addWidget(tabWidget,1,0)
